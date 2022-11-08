@@ -1,0 +1,96 @@
+{
+  "message": "Привет, i18n!",
+  "buttons": {
+    "create": "Создать",
+    "logOut": "Выйти",
+    "toMainPage": "На главную",
+    "connect": "Присоединиться"
+  },
+  "organization": {
+    "organization": "Организация",
+    "prefix": "Префикс",
+    "subdomain": "Поддомен",
+    "name": "Имя"
+  },
+  "room": {
+    "createNewRoom": "Создать комнату",
+    "moneyPerMonth": "Деньги за месяц",
+    "numberOfTurns": "Количество месяцев",
+    "roomsList": "Список комнат",
+    "room": "Комната",
+    "goToRoom": "Перейти в комнату",
+    "round": "Раунд",
+    "player": {
+      "playersList": "Список игроков",
+      "player": "Игрок",
+      "roomOwner": "Владелец комнаты",
+      "effectsList": "Изменения",
+      "chat": "Чат",
+      "you": "Вы",
+      "application": "Кол-во"
+    },
+    "gameBoard": {
+      "gameBoard": "Игровая доска",
+      "channelsTitle": "Каналы",
+      "trafficTitle": "Трафик",
+      "total": "Итого",
+      "stageConversion": "Конверсия этапа"
+    },
+    "mechanics": "Механика",
+    "month": "Месяц",
+    "card": {
+      "cardsList": "Список карточек",
+      "chooseCard": "Выбрать",
+      "selectedCard": "Выбранная карточка",
+      "deselectCard": "Отменить выбор",
+      "send": "Завершить ход"
+    },
+    "waitingHeader": "Ожидаем подключения игроков...",
+    "waitingTextForOwner": "Когда все приглашённые игроки зайдут в комнату, вы можете начать игру",
+    "startRoundButton": "Начать раунд",
+    "roundFinishedHeader": "Раунд {round} завершён",
+    "reStartRoundButton": "Начать новый раунд {nextRound}",
+    "navigation": {
+      "players": "Участники",
+      "effects": "Эффекты",
+      "chat": "Чат",
+      "cards": "Карточки"
+    },
+    "flow": "Игровая механика",
+    "connectRoom": "Присоединиться к комнате",
+    "roomCode": "Номер комнаты",
+    "startMonth": "Начальный месяц",
+    "step": "Ход",
+    "passStep": "Пропуск хода",
+    "firstPlace": "I место",
+    "secondPlace": "II место",
+    "thirdPlace": "III место",
+    "yourResult": "Ваш результат",
+    "notPrizePlace": "Не призовое место",
+    "place": "Место"
+  },
+  "headers": {
+    "main": "Главная",
+    "newOrganization": "Создать новую организацию",
+    "organizationList": "Ваши организации",
+    "newOrganizationBtn": "Создать новую организацию"
+  },
+  "version": "Версия",
+  "auth": {
+    "authHeader": "Авторизация",
+    "enterButton": "Войти",
+    "emailLabel": "Электронная почта",
+    "passwordLabel": "Пароль",
+    "signUpText": "Ещё нет учётной записи?",
+    "signUpButton": "Зарегистрироваться",
+    "signUpHeader": "Зарегистрироваться",
+    "enterText": "Уже есть учётная запись?",
+    "firstNameLabel": "Имя",
+    "lastNameLabel": "Фамилия",
+    "signUpSuccessText": "Войдите в учётную запись, чтобы начать играть.",
+    "signUpSuccessHeader": "Вы успешно зарегистрированы!"
+  },
+  "textInput": {
+    "requiredError": "Обязательное поле!"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  organizationsByUser {
+    id
+    name
+    prefix
+    subdomain
+    __typename
+  }
+}

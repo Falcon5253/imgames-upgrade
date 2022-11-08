@@ -1,0 +1,10 @@
+mutation ($name: String!, $prefix: String!, $subdomain: String!) {
+  createOrganization(name: $name, prefix: $prefix, subdomain: $subdomain) {
+    organization {
+      id
+      subdomain
+    }
+    success
+    errors
+  }
+}

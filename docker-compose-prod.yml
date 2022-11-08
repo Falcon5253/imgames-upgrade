@@ -1,0 +1,84 @@
+version: '3.3'
+
+volumes:
+  postgres_data: {}
+  redis_data: {}
+
+services:
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+    command: /gunicorn.sh
+    entrypoint: /entrypoint.sh
+    restart: on-failure
+    env_file: .env
+
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file: .env
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - '8000:80'
+    depends_on:
+      - backend
+    volumes:
+      - ./backend/media/:/media/
+      - ./backend/staticfiles/:/staticfiles/
+      - ./nginx/prod.conf:/etc/nginx/nginx.conf:ro
+
+  # Брокер сообщений Redis
+  redis:
+    container_name: sagelove_redis
+    restart: always
+    image: redis:alpine
+    env_file: .env
+    volumes:
+      - redis_data:/var/lib/redis
+
+  # Бэкенд Django ASGI
+  backend_asgi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.asgi
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    command: /start_asgi.sh
+    entrypoint: /entrypoint.sh
+    restart: on-failure
+    env_file: .env
+    links:
+      - redis
+
+  backups:
+    image: prodrigestivill/postgres-backup-local
+    restart: on-failure
+    depends_on:
+      - postgres
+    volumes:
+      - /tmp/backups/:/backups/
+
+  # Celery Worker
+  celery:
+    restart: always
+    build:
+      context: ./backend
+    command: celery --app config worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    env_file: .env
+    depends_on:
+      - backend
+      - redis

@@ -1,0 +1,13 @@
+query ($code: String!) {
+  stagesByCode(code: $code) {
+    id
+    name
+    conversion
+    stageinsequence {
+      id
+      place
+      __typename
+    }
+    __typename
+  }
+}

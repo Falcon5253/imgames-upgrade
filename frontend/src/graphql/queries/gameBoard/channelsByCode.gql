@@ -1,0 +1,8 @@
+query ($code: String!) {
+  channelsByCode(code: $code) {
+    id
+    name
+    defaultValue
+    __typename
+  }
+}

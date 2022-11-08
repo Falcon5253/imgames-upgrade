@@ -1,0 +1,13 @@
+query ($code: String!) {
+  allComputedMonthsByCode(code: $code) {
+    channel {
+      id
+      name
+      __typename
+    }
+    data
+    isTotal
+    monthKey
+    __typename
+  }
+}

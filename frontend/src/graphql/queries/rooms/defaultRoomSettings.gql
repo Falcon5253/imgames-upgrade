@@ -1,0 +1,13 @@
+query ($subdomain: String!) {
+  defaultRoomSettings(subdomain: $subdomain) {
+    numberOfTurnsDefault
+    numberOfTurnsMax
+    numberParticipantsMax
+    moneyPerMonthDefault
+    flowsInOrganization {
+      id
+      title
+      __typename
+    }
+  }
+}

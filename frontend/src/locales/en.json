@@ -1,0 +1,96 @@
+{
+  "message": "Hello, i18n!",
+  "buttons": {
+    "create": "Create",
+    "logOut": "Log out",
+    "toMainPage": "To the main",
+    "connect": "Join"
+  },
+  "organization": {
+    "organization": "Organization",
+    "prefix": "Prefix",
+    "subdomain": "Subdomain",
+    "name": "Name"
+  },
+  "room": {
+    "createNewRoom": "Create new room",
+    "moneyPerMonth": "Money per month",
+    "numberOfTurns": "Number of months",
+    "roomsList": "Rooms list",
+    "room": "Room",
+    "goToRoom": "Jump into the room",
+    "round": "Round",
+    "player": {
+      "playersList": "List of players",
+      "player": "Player",
+      "roomOwner": "Room owner",
+      "effectsList": "Effects",
+      "chat": "Chat",
+      "you": "You",
+      "application": "Qty"
+    },
+    "gameBoard": {
+      "gameBoard": "Game board",
+      "channelsTitle": "Channels",
+      "trafficTitle": "Traffic",
+      "total": "Total",
+      "stageConversion": "Conversion of stage"
+    },
+    "mechanics": "Flow",
+    "month": "Month",
+    "card": {
+      "cardsList": "List of cards",
+      "chooseCard": "Select",
+      "selectedCard": "Selected card",
+      "deselectCard": "Deselect",
+      "send": "Send"
+    },
+    "waitingHeader": "Waiting for players to join...",
+    "waitingTextForOwner": "When all invited players enter the room, you can start the game",
+    "startRoundButton": "Start round",
+    "roundFinishedHeader": "Round {round} completed",
+    "reStartRoundButton": "Start a new round ({nextRound})",
+    "navigation": {
+      "players": "Members",
+      "effects": "effects",
+      "chat": "Chat",
+      "cards": "Cards"
+    },
+    "flow": "Game mechanics",
+    "connectRoom": "Join the room",
+    "roomCode": "Room code",
+    "startMonth": "Start month",
+    "step": "Step",
+    "passStep": "Skip a turn",
+    "firstPlace": "1st place",
+    "secondPlace": "2nd place",
+    "thirdPlace": "III place",
+    "yourResult": "Your score",
+    "notPrizePlace": "Not a prize",
+    "place": "Place"
+  },
+  "headers": {
+    "main": "Main",
+    "newOrganization": "Create new organization",
+    "organizationList": "Your organizations",
+    "newOrganizationBtn": "Create a new organization"
+  },
+  "version": "Version",
+  "auth": {
+    "authHeader": "Authorization",
+    "enterButton": "Log in",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "signUpText": "Don't have an account yet?",
+    "signUpButton": "Sign Up",
+    "signUpHeader": "Sign Up",
+    "enterText": "Already have an account?",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "signUpSuccessText": "Sign in to your account to start playing.",
+    "signUpSuccessHeader": "You have successfully registered!"
+  },
+  "textInput": {
+    "requiredError": "Obligatory field!"
+  }
+}

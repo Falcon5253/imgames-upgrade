@@ -1,0 +1,8 @@
+query ($code: String!) {
+  cardsByCode(code: $code) {
+    id
+    header
+    shortDescription
+    cost
+  }
+}

@@ -1,0 +1,6 @@
+mutation ($code: String!) {
+  startRound(code: $code) {
+    success
+    errors
+  }
+}

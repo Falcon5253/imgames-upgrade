@@ -1,0 +1,12 @@
+subscription ($code: String!, $userId: ID!) {
+  computedChannelsByCodeUpdated(code: $code, userId: $userId) {
+    channel {
+      id
+      name
+      __typename
+    }
+    data
+    isTotal
+    __typename
+  }
+}

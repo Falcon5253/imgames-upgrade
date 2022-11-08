@@ -1,0 +1,91 @@
+version: '3.3'
+
+volumes:
+  imgames_data: {}
+  redis_data: {}
+
+services:
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+    command: /start.sh
+    entrypoint: /entrypoint.sh
+    restart: on-failure
+    env_file: .env
+
+  frontend:
+    image: node:10-alpine
+    command: npm run serve
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./frontend:/app
+    working_dir: /app
+    restart: on-failure
+
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+      - imgames_data:/var/lib/postgresql/data
+    env_file: .env
+
+  # mailhog:
+  #   image: mailhog/mailhog
+  #   ports:
+  #     - '8025:8025'
+  #   logging:
+  #     driver: none
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '8888:80'
+    depends_on:
+      - backend
+    volumes:
+      - ./backend/media/:/media/
+      - ./backend/staticfiles/:/staticfiles/
+      - ./nginx/dev.conf:/etc/nginx/nginx.conf:ro
+    logging:
+      driver: none
+
+  # Брокер сообщений Redis
+  redis:
+    restart: always
+    image: redis:alpine
+    # env_file: .env
+    volumes:
+      - redis_data:/var/lib/redis
+
+  # Бэкенд Django ASGI
+  backend_asgi:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.asgi
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    command: /start_asgi.sh
+    entrypoint: /entrypoint.sh
+    restart: on-failure
+    env_file: .env
+    links:
+      - redis
+
+  # Celery Worker
+  celery:
+    restart: always
+    build:
+      context: ./backend
+    command: celery --app config worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    env_file: .env
+    depends_on:
+      - backend
+      - redis

@@ -1,0 +1,22 @@
+mutation (
+  $moneyPerMonth: Int!
+  $numberOfTurns: Int!
+  $subdomain: String!
+  $flowId: ID!
+) {
+  createRoom(
+    moneyPerMonth: $moneyPerMonth
+    numberOfTurns: $numberOfTurns
+    subdomain: $subdomain
+    flowId: $flowId
+  ) {
+    room {
+      id
+      code
+      __typename
+    }
+    success
+    errors
+    __typename
+  }
+}

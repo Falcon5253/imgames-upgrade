@@ -1,0 +1,18 @@
+query ($code: String!) {
+  winnersFromCurrentRound(code: $code) {
+    id
+    user {
+      id
+      lastName
+      firstName
+      __typename
+    }
+    round {
+      id
+      key
+      __typename
+    }
+    place
+    __typename
+  }
+}

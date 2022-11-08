@@ -1,0 +1,12 @@
+subscription ($code: String!) {
+  roomParticipantsUpdated(code: $code) {
+    id
+    user {
+      id
+      lastName
+      firstName
+      __typename
+    }
+    __typename
+  }
+}

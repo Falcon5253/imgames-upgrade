@@ -1,0 +1,10 @@
+mutation ($code: String!, $cardsId: [ID]!) {
+  writeTurn(code: $code, cardsId: $cardsId) {
+    turn {
+      id
+      __typename
+    }
+    success
+    errors
+  }
+}
