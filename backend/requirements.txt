@@ -1,6 +1,5 @@
 importlib-metadata==4.13.0
 autopep8
-attrs==20.3.0
 backcall==0.2.0
 certifi==2020.12.5
 chardet==4.0.0
@@ -54,3 +53,4 @@ graphene_subscriptions
 celery
 pytest
 pytest-django
+attrs~=21.0
