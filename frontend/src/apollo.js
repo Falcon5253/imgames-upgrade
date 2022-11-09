@@ -11,7 +11,7 @@ Vue.use(VueApollo);
 // Name of the localStorage item
 const AUTH_TOKEN = 'jwt-token';
 
-let wsHostDomain = process.env.VUE_APP_WS_HOST_DOMAIN || 'localhost:8000';
+let wsHostDomain = process.env.VUE_APP_WS_HOST_DOMAIN || 'localhost:8888';
 let wsProtocol = process.env.VUE_APP_WS_PROTOCOL || 'ws';
 // Config
 const defaultOptions = {
