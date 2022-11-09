@@ -7,4 +7,4 @@ set -o xtrace
 
 python manage.py migrate
 python manage.py collectstatic --noinput --verbosity 0
-daphne -b 0.0.0.0 -p 8001 config.asgi:application
+daphne -b 0.0.0.0 -p 8881 config.asgi:application
