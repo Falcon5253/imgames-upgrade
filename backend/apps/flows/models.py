@@ -76,21 +76,26 @@ class Stage(models.Model):
     def save(self, *args, **kwargs):
         stages_in_flow = Stage.objects.filter(flow=self.flow)
         print('stages_in_flow', stages_in_flow)
-        new_place = 1
-        if len(stages_in_flow) != 0:
-            new_place = 2
-            for stage in stages_in_flow:
-                stage_in_sequence = StageInSequence.objects.filter(
-                    stage=stage).first()
-                print('stage_in_sequence', stage_in_sequence)
-                if stage_in_sequence is not None:
-                    print('stage_in_sequence is not None')
-                    if stage_in_sequence.place >= new_place:
-                        new_place = stage_in_sequence.place+1
-                        print('stage_in_sequence.place+1', new_place)
-        super(Stage, self).save(*args, **kwargs)
-        StageInSequence.objects.get_or_create(
-            stage=self, place=new_place)
+
+
+        if self not in stages_in_flow:
+            new_place = 1
+            if len(stages_in_flow) != 0:
+                new_place = 2
+                for stage in stages_in_flow:
+                    stage_in_sequence = StageInSequence.objects.filter(
+                        stage=stage).first()
+                    print('stage_in_sequence', stage_in_sequence)
+                    if stage_in_sequence is not None:
+                        print('stage_in_sequence is not None')
+                        if stage_in_sequence.place >= new_place:
+                            new_place = stage_in_sequence.place+1
+                            print('stage_in_sequence.place+1', new_place)
+            super(Stage, self).save(*args, **kwargs)
+            StageInSequence.objects.get_or_create(
+                stage=self, place=new_place)
+        else:
+            super(Stage, self).save(*args, **kwargs)
 
 
 class Channel(models.Model):
