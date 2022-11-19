@@ -24,8 +24,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
     channels = Channel.objects.filter(flow=flow)
 
     # Находим данные о этапах воронки по умолчанию
-    stages = Stage.objects.filter(flow=flow)
-
+    stages = Stage.objects.filter(flow=flow).order_by('id')
     answer_array = []
     # Если начальный месяц
     if current_month.key == 0:
@@ -80,7 +79,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
 
         # Получаем вычисленные этапы по шагу
         computed_stages = StageComputed.objects.filter(
-            turn=user_turn)
+            turn=user_turn).order_by("stage")
 
         # Получаем вычисленные каналы по шагу
         computed_channels = ChannelComputed.objects.filter(
