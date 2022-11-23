@@ -8,6 +8,7 @@
       'bg-blue': type == 'bg-blue',
       'bg-green': type == 'bg-green',
       'bg-outline': type == 'bg-outline',
+      'bg-disabled': type == 'bg-disabled',
     }"
   >
     <slot></slot>
@@ -96,5 +97,19 @@ button {
   height: 40px;
   border-radius: 8px;
   background: transparent;
+}
+.bg-disabled {
+  border: 0px;
+  background: linear-gradient(135deg, #707070 0%, #242424 100%);
+  border-radius: 8px;
+  font-family: $primary_font;
+  color: $light_text_color;
+  font-weight: bold;
+  font-size: 14px;
+  height: 40px;
+  min-width: 100px;
+}
+button:disabled {
+  cursor: default;
 }
 </style>

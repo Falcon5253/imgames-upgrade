@@ -9,11 +9,11 @@
       ></TableHeadCell>
       <template v-for="(stage, index) in sortedStages">
         <TableHeadCell
-          :textContent="$t('room.gameBoard.stageConversion') + ' ' + stage.name"
+          :textContent="stage.name"
           :key="'head-' + monthKey + '-' + stage.id + '.1'"
         ></TableHeadCell>
         <TableHeadCell
-          :textContent="stage.name"
+          :textContent="$t('room.gameBoard.stageConversion')"
           :key="'head-' + monthKey + '-' + stage.id + '.2'"
           v-if="index != stages.length - 1"
         ></TableHeadCell>

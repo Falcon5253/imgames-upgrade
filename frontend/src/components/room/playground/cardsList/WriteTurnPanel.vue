@@ -1,9 +1,18 @@
 <template>
   <div>
     <SubmitButton
+      v-if="!isDisabled"
       class="w-100"
       @click="sendCardChoice"
       :type="'bg-green'"
+      :disabled="isDisabled"
+      >{{ $t('room.card.send') }}</SubmitButton
+    >
+    <SubmitButton
+      v-else
+      class="w-100"
+      @click="sendCardChoice"
+      :type="'bg-disabled'"
       :disabled="isDisabled"
       >{{ $t('room.card.send') }}</SubmitButton
     >

@@ -3,6 +3,7 @@ query ($code: String!) {
     id
     code
     numberOfTurns
+    moneyPerMonth
     roomOwner {
       id
       lastName

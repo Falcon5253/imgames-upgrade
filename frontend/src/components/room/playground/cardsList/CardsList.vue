@@ -1,9 +1,12 @@
 <template>
   <div id="cards-panel">
-    <h3>{{ $t('room.card.cardsList') }}</h3>
+    <div class="cards-context">
+      <h3 class="cards-title">{{ $t('room.card.cardsList') }}</h3>
+      <p class="current-budget">Оставшийся бюджет: {{ balance }} / {{ getMoneyPerMonth() }}</p>
+    </div>
     <WriteTurnPanel
       class="write-turn-panel"
-      :disabled="!canDoStepNowByCode"
+      :disabled="balance < 0"
       :selectedCardsId="selectedCardsId"
       @clean="selectedCardsId = []"
     ></WriteTurnPanel>
@@ -24,6 +27,7 @@
 <script>
 import cardsByCode from '@/graphql/queries/gameBoard/cardsByCode.gql';
 import canDoStepNowByCode from '@/graphql/queries/gameBoard/canDoStepNowByCode.gql';
+import roomByCode from '@/graphql/queries/rooms/roomByCode.gql';
 import Card from '@/components/room/playground/cardsList/Card.vue';
 import WriteTurnPanel from '@/components/room/playground/cardsList/WriteTurnPanel.vue';
 
@@ -34,6 +38,14 @@ export default {
     WriteTurnPanel,
   },
   apollo: {
+    roomByCode: {
+      query: roomByCode,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+    },
     cardsByCode: {
       query: cardsByCode,
       variables() {
@@ -54,6 +66,8 @@ export default {
   data() {
     return {
       selectedCardsId: [],
+      balance: 0,
+      balanceIsPositive: true,
     };
   },
   computed: {
@@ -65,18 +79,42 @@ export default {
     addChoice(cardId) {
       if (!this.isSelected(cardId)) {
         this.selectedCardsId.push(+cardId);
+        this.countBalance();
+        console.log(this.balanceIsPositive());
       }
     },
     removeChoice(cardId) {
       if (this.isSelected(cardId)) {
         this.selectedCardsId = this.selectedCardsId.filter(
-          (el) => +el !== +cardId
+          (el) => {
+            return el != cardId;
+          }
         );
+        this.countBalance();
+        console.log(this.balanceIsPositive());
       }
     },
     isSelected(cardId) {
       return +this.selectedCardsId.findIndex((el) => +el == +cardId) !== -1;
     },
+    countBalance() {
+      var expenses = 0;
+      this.selectedCardsId.forEach(id => {
+        this.cardsByCode.forEach(card => {
+          if(card.id == id) {
+            expenses = expenses + card.cost;
+          };
+        });
+      });
+      this.balance = this.getMoneyPerMonth() - expenses;
+    },
+    getMoneyPerMonth() {
+      return this.roomByCode.moneyPerMonth;
+    },
+  },
+  updated() {
+    this.countBalance();
+    this.checkBalance();
   },
 };
 </script>
@@ -86,6 +124,19 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 300px;
+
+  & .cards-context {
+    display: flex;
+  }
+
+  & .cards-title {
+    width: 50%;
+  }
+
+  & .current-budget {
+    width: 50%;
+    text-align: right;
+  }
 
   & .cards-list {
     width: 100%;

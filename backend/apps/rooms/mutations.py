@@ -80,6 +80,14 @@ class WriteTurn(graphene.Mutation):
                 current_round = room.current_round
                 current_month = current_round.current_month
 
+                # Если общая ценна карточек больше бюджета на месяц, возвращаем ошибку
+                cards_price = 0
+                for card_id in cards_id:
+                    card = Card.objects.get(pk=card_id)
+                    cards_price += card.cost
+                if cards_price > room.money_per_month:
+                    raise Exception('Cards price is bigger than money given per month')
+
                 # Если шаг существует, возвращаем ошибку
                 turn = Turn.objects.filter(
                     month=current_month, user=user).count()
