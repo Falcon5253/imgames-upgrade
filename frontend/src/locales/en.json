@@ -20,6 +20,7 @@
     "room": "Room",
     "goToRoom": "Jump into the room",
     "round": "Round",
+    "scores": "Total scores: ",
     "player": {
       "playersList": "List of players",
       "player": "Player",

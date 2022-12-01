@@ -41,7 +41,7 @@ def change_month_in_room(room_id):
         # 1. Записываем в computed начальные значения
 
         # Получаем набор шагов за прошедший игровой месяц
-        old_month_users_turns = Turn.objects.filter(month=old_month)
+        old_month_users_turns = Turn.objects.filter(month=old_month).order_by('id')
 
         # Если месяц был в комнате начальным (шаг игрока №1)
         if old_month.key == 0:
@@ -148,24 +148,55 @@ def change_month_in_room(room_id):
         current_round.current_month = new_month[0]
         current_round.save()
 
+        # Если последний месяц
         if Month.objects.filter(key=new_key+1, round=current_round).count() == 0:
             try:
+                total_points = {}
+                all_month_of_the_round = Month.objects.filter(round=current_round).order_by('id')
+                
+                # Ищем сумму финальных очков за предыдущие месяца
+                for month in all_month_of_the_round:
+                    turn_of_the_month =  Turn.objects.filter(month=month).order_by('id')
+
+                    for turn in turn_of_the_month:
+                        computed_array = prepare_computed_game_data_array(
+                            user=turn.user, room=room, current_month=month)
+                        if turn.user.id not in total_points.keys():
+                            total_points[turn.user.id] = 0.00
+                        total_points[turn.user.id] += float(computed_array[-1].data[-1])
+
+                # Добавляем очки за следующие месяца
                 print('ПОСЛЕДНИЙ МЕСЯЦ!!!')
-                rating = defaultdict(int)
                 for turn in old_month_users_turns:
                     computed_array = prepare_computed_game_data_array(
                         room=room, user=turn.user)
                     computed_total = computed_array[:-1][0].data[-1]
-                    rating[turn.user.id] = int(float(computed_total))
-                rating = sorted(rating)
 
-                for i, user_id in enumerate(rating[:3]):
-                    place = i + 1
+                    if turn.user.id not in total_points.keys():
+                        total_points[turn.user.id] = 0.00
+                    total_points[turn.user.id] += float(computed_array[-1].data[-1])
+
+                # Сортируем по значениям
+                sorted_values = sorted(total_points.values())
+                sorted_total_points = {}
+
+                for i in sorted_values:
+                    for k in total_points.keys():
+                        if total_points[k] == i:
+                            sorted_total_points[k] = total_points[k]
+                            break
+                place = 0
+                # Заполнить победителей в БД
+                for user_id in total_points:
+                    place += 1
+                    if place > 3:
+                        break
                     user = User.objects.get(pk=user_id)
+                    result = total_points[user_id]
                     Winner.objects.create(
-                        user=user, place=place, round=current_round)
-                    print(f'place: {i}, user_id: {user_id}')
-
+                        user=user, place=place, round=current_round, result=result)
+                    print(f'place: {place}, user_id: {user_id}')
+                    
                 print('ПОСЛЕДНИЙ МЕСЯЦ!!!')
             except Exception as e:
                 print('ERROR', e)

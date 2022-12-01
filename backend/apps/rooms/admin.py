@@ -4,8 +4,8 @@ from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant
 
 @admin.register(Winner)
 class WinnerAdmin(admin.ModelAdmin):
-    list_display = ('place', 'user',  'round')
-    list_display_links = ('place', 'user',)
+    list_display = ( 'user', 'place',  'round', 'result')
+    list_display_links = ('place', 'user')
 
 
 @admin.register(Turn)

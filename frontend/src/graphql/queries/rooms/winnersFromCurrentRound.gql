@@ -12,6 +12,7 @@ query ($code: String!) {
       key
       __typename
     }
+    result
     place
     __typename
   }

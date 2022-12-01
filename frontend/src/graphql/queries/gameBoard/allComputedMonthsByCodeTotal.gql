@@ -1,0 +1,3 @@
+query ($code: String!) {
+  allComputedMonthsByCodeTotal(code: $code)
+}

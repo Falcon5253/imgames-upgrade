@@ -63,7 +63,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
         # Добавляем значение ИТОГО
         answer_array += [ComputedGameDataType(
             data=total_data, channel=None, is_total=True)]
-
+        # print(total_data)
         return answer_array
 
     # Если не начальный месяц
@@ -132,6 +132,8 @@ class Query(graphene.ObjectType):
     ), description='Игровые данные пользователя на текущий месяц по коду комнаты')
     all_computed_months_by_code = graphene.List(ComputedGameDataType, code=graphene.String(
     ), description='Игровые данные пользователя на текущий месяц по коду комнаты')
+    all_computed_months_by_code_total = graphene.Int(code=graphene.String(
+    ), description='Всего очков набрано пользователем')
 
     def resolve_computed_channels_by_code(root, info, code):
         try:
@@ -165,6 +167,29 @@ class Query(graphene.ObjectType):
                     computed_data += prepare_computed_game_data_array(
                         room=room, user=user, current_month=month)
                 return computed_data
+            else:
+                raise Exception('Error code')
+        except Exception as e:
+            print(e)
+            return None
+    
+    def resolve_all_computed_months_by_code_total(root, info, code):
+        try:
+            code_array = str(code).split('-')
+            if len(code_array) > 1:
+                user = info.context.user
+                organization = Organization.objects.get(
+                    prefix__iexact=code_array[0])
+                room = Room.objects.get(
+                    key=code_array[1], organization=organization)
+                current_round = room.current_round
+                months = Month.objects.filter(round=current_round)
+                total = 0
+                for month in months:
+                    for channel in prepare_computed_game_data_array(room=room, user=user, current_month=month):
+                        if channel.is_total == True:
+                            total += int(float(channel.data[-1]))
+                return total
             else:
                 raise Exception('Error code')
         except Exception as e:

@@ -25,7 +25,7 @@
           <p>{{ $t('room.yourResult') }}</p>
         </div>
         <div class="place-text">
-          {{ placeText(userPlace) }}
+          {{ placeText(userPlace) }} ( {{ allComputedMonthsByCodeTotal }} )
         </div>
       </div>
     </div>
@@ -47,6 +47,8 @@
           </p>
           <small>{{ $t('room.player.player') }}</small>
           <p>{{ winner.user.lastName }} {{ winner.user.firstName }}</p>
+          <small>{{ $t('room.scores')}}</small>
+          <p>{{ winner.result }}</p>
         </div>
       </div>
     </div>
@@ -85,6 +87,7 @@ import FinishFunnelTable from '@/components/room/playground/FinishFunnelTable.vu
 import reStartRound from '@/graphql/mutations/rooms/reStartRound.gql';
 import turnsFromCurrentRound from '@/graphql/queries/rooms/turnsFromCurrentRound.gql';
 import allComputedMonthsByCode from '@/graphql/queries/gameBoard/allComputedMonthsByCode.gql';
+import allComputedMonthsByCodeTotal from '@/graphql/queries/gameBoard/allComputedMonthsByCodeTotal.gql';
 import channelsByCode from '@/graphql/queries/gameBoard/channelsByCode.gql';
 import stagesByCode from '@/graphql/queries/gameBoard/stagesByCode.gql';
 import winnersFromCurrentRound from '@/graphql/queries/rooms/winnersFromCurrentRound.gql';
@@ -170,6 +173,14 @@ export default {
     },
     allComputedMonthsByCode: {
       query: allComputedMonthsByCode,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+    },
+    allComputedMonthsByCodeTotal: {
+      query: allComputedMonthsByCodeTotal,
       variables() {
         return {
           code: this.roomCode,

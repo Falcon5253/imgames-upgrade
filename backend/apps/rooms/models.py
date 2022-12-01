@@ -121,12 +121,15 @@ class CardChoice(models.Model):
 
 class Winner(models.Model):
     """Победитель"""
+
     user = models.ForeignKey(
         User, verbose_name="Пользователь", on_delete=models.CASCADE)
     round = models.ForeignKey(
         Round, verbose_name="Раунд", on_delete=models.CASCADE)
     place = models.CharField(
         verbose_name="Место", max_length=1, choices=PLACE_SELECTION)
+    result = models.IntegerField(
+        verbose_name="Очки")
 
     class Meta:
         verbose_name = "Призёр"
