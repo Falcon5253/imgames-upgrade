@@ -110,6 +110,9 @@ def change_month_in_room(room_id):
 
                 # Для каждого изменения параметра
                 for parameter_change in parameter_change_list:
+                    # Если месяц применения не равен текущему месяцу или не равен нулю, то пропускаем карточку.
+                    if parameter_change.month_of_application != old_month.key+1 and parameter_change.month_of_application != 0:
+                        continue
                     # Если происходит изменение начального трафика канала
                     if parameter_change.type == "FSVL":
                         # Находим в вычисляемых значениях ChannelComputed
@@ -131,6 +134,49 @@ def change_month_in_room(room_id):
                         computed_stage.conversion = round(compute_value(
                             old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
                         computed_stage.save()
+            
+            # Находим ходы за предыдущие месяца для проверки месяца применения карточек
+            prev_turns = []
+            all_months = Month.objects.filter(round=current_round)
+            for month in all_months:
+                try:
+                    prev_turn = Turn.objects.get(user=turn.user, month=month)
+                    if prev_turn != turn:
+                        prev_turns += [prev_turn]
+                except Turn.DoesNotExist:
+                    pass
+            print(turn.user)
+            for prev_turn in prev_turns:
+                user_card_choices = CardChoice.objects.filter(turn=prev_turn)
+                for card_choice in user_card_choices:
+                    parameter_change_list = ParameterChange.objects.filter(
+                        card=card_choice.card)
+                    for parameter_change in parameter_change_list:
+                        if parameter_change.month_of_application == old_month.key+1:
+                            print("прим1")
+                            if parameter_change.type == "FSVL":
+                                print("прим")
+                                # Находим в вычисляемых значениях ChannelComputed
+                                computed_channel = ChannelComputed.objects.get(
+                                    channel=parameter_change.channel, turn=turn)
+
+                                # Изменяем значение трафика
+                                computed_channel.cardinal_value = ceil(compute_value(
+                                    old_value=computed_channel.cardinal_value, math_operator=parameter_change.math_operator, change_value=parameter_change.value))
+                                computed_channel.save()
+
+                            # Если происходит изменение конверсии этапа:
+                            if parameter_change.type == "CONV":
+                                print("прим2")
+                                # Находим вычисляемое значение StageComputed
+                                computed_stage = StageComputed.objects.get(
+                                    stage=parameter_change.stage, turn=turn)
+
+                                # Изменяем значение конверсии этапа
+                                computed_stage.conversion = round(compute_value(
+                                    old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
+                                computed_stage.save()
+
 
         # Высчитываем следующий номер месяца
         new_key = old_month.key+1
@@ -170,14 +216,13 @@ def change_month_in_room(room_id):
                 for turn in old_month_users_turns:
                     computed_array = prepare_computed_game_data_array(
                         room=room, user=turn.user)
-                    computed_total = computed_array[:-1][0].data[-1]
 
                     if turn.user.id not in total_points.keys():
                         total_points[turn.user.id] = 0.00
                     total_points[turn.user.id] += float(computed_array[-1].data[-1])
 
                 # Сортируем по значениям
-                sorted_values = sorted(total_points.values())
+                sorted_values = sorted(total_points.values(), reverse=True)
                 sorted_total_points = {}
 
                 for i in sorted_values:
