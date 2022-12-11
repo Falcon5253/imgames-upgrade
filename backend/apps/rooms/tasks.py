@@ -222,14 +222,19 @@ def change_month_in_room(room_id):
                     total_points[turn.user.id] += float(computed_array[-1].data[-1])
 
                 # Сортируем по значениям
-                sorted_values = sorted(total_points.values(), reverse=True)
                 sorted_total_points = {}
+                sorted_values = []
+
+                for value in total_points.values():
+                    sorted_values += [int(value)]
+                    sorted_values = sorted(sorted_values)
 
                 for i in sorted_values:
                     for k in total_points.keys():
                         if total_points[k] == i:
                             sorted_total_points[k] = total_points[k]
                             break
+                        
                 place = 0
                 # Заполнить победителей в БД
                 for user_id in total_points:

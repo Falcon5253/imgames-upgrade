@@ -1,5 +1,5 @@
 import graphene
-from .models import Room, Round, Month, Turn, CardChoice, RoomParticipant
+from .models import Room, Round, Month, Turn, CardChoice, RoomParticipant, Message
 
 from apps.organizations.models import Organization
 from apps.flows.models import Flow, Card
@@ -145,6 +145,29 @@ class StartRound(graphene.Mutation):
         except Exception as e:
             return StartRound(success=False, errors=[str(e)])
 
+class SendMessage(graphene.Mutation):
+    """ Мутация отправки сообщения внутри комнаты """
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+
+    class Arguments:
+        code = graphene.String(required=True)
+        text = graphene.String(required=True)
+
+    def mutate(self, info, code, text):
+        try:
+            code_array = str(code).split('-')
+            if len(code_array) > 1:
+                user = info.context.user
+                organization = Organization.objects.get(
+                    prefix__iexact=code_array[0])
+                room = Room.objects.get(
+                    key=code_array[1], organization=organization)
+                Message.objects.create(room=room, user=user, text=text)
+                return SendMessage(success=True)
+        except Exception as e:
+            print(e)
+            return SendMessage(success=False, errors=[str(e)])
 
 class ReStartRound(graphene.Mutation):
     """ Мутация для начала нового раунда комнаты в пространстве организации """

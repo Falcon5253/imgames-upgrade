@@ -1,0 +1,12 @@
+subscription ($code: String!) {
+    chatUpdated(code: $code) {
+    id,
+    text,
+    createdAt,
+    user {
+      id,
+      firstName,
+      lastName,
+    }
+  }
+}

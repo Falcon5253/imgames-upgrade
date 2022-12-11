@@ -1,0 +1,6 @@
+mutation ($code: String!, $text: String!) {
+  sendMessage(code: $code, text: $text) {
+    success,
+    errors
+  }
+}

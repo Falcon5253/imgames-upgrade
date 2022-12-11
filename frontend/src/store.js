@@ -71,9 +71,9 @@ const store = new Vuex.Store({
     CLEAN_CHOSEN_CARD(state) {
       state.chosenCards = [];
     },
-    ADD_MESSAGE(state, message) {
-      state.messages.push(message);
-    },
+    // ADD_MESSAGE(state, message) {
+    //   state.messages.push(message);
+    // },
   },
   actions: {},
 });

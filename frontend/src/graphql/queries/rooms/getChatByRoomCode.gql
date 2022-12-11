@@ -1,0 +1,12 @@
+query ($code: String!) {
+  getChatByRoomCode(code: $code) {
+    id,
+    text,
+    createdAt,
+    user {
+      id,
+      firstName,
+      lastName,
+    }
+  }
+}

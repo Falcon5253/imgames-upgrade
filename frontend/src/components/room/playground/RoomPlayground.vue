@@ -63,6 +63,7 @@
           <Chat
             class="mobile-popup second-column-full"
             v-if="isChatShown"
+            :messages="getChatByRoomCode"
           ></Chat>
         </transition>
       </template>
@@ -88,6 +89,7 @@
         </transition>
         <transition name="slide-fade" mode="out-in">
           <Chat
+            :messages="getChatByRoomCode"
             class="mobile-popup second-column-full"
             v-if="isChatShown"
           ></Chat>
@@ -138,6 +140,8 @@ import FinishScreen from '@/components/room/playground/FinishScreen.vue';
 import TopBar from '@/components/ui/TopBar.vue';
 import Chat from '@/components/room/playground/Chat.vue';
 import { MAIN_PATH } from '@/pathVariables.js';
+import getChatByRoomCode from '@/graphql/queries/rooms/getChatByRoomCode.gql';
+import chatUpdated from '@/graphql/subscriptions/rooms/chatUpdated.gql';
 
 export default {
   name: 'RoomPlayground',
@@ -254,6 +258,38 @@ export default {
           return { roomByCode: subscriptionData.data.roomUpdated };
         },
       },
+    },
+    getChatByRoomCode: {
+      query: getChatByRoomCode,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+      subscribeToMore: {
+        document: chatUpdated,
+        variables() {
+          return {
+            code: this.roomCode,
+            userId: this.userId,
+          };
+        },
+        skip() {
+          return this.skip;
+        },
+        updateQuery: (previousResult, { subscriptionData }) => {
+          let existIndex = previousResult.getChatByRoomCode.findIndex(
+            (el) => {
+              return el.id == subscriptionData.data.chatUpdated.id;
+            }
+          );
+          if (existIndex == -1) {
+            previousResult.getChatByRoomCode.push(
+              subscriptionData.data.chatUpdated
+            );
+          };
+        },
+      }
     },
     currentRoundByCode: {
       query: currentRoundByCode,

@@ -1,11 +1,16 @@
 from django.contrib import admin
-from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant
+from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant, Message
 
 
 @admin.register(Winner)
 class WinnerAdmin(admin.ModelAdmin):
     list_display = ( 'user', 'place',  'round', 'result')
     list_display_links = ('place', 'user')
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ( 'room', 'user', 'text', 'created_at')
+    # list_display_links = ('place', 'user')
 
 
 @admin.register(Turn)

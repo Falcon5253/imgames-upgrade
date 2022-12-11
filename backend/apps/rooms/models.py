@@ -181,3 +181,16 @@ class RoomParticipant(models.Model):
 
     def __str__(self):
         return f"Участник #{str(self.id)}"
+
+class Message(models.Model):
+    """"Сообщения"""
+    room = models.ForeignKey(
+        Room, verbose_name="Комната", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    text = models.TextField (verbose_name='Текст')
+    created_at = models.DateTimeField("Время отправления", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Сообщение"
+        verbose_name_plural = "Сообщения"

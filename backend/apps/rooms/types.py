@@ -1,5 +1,5 @@
 import graphene
-from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant
+from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant, Message
 from apps.organizations.models import Organization
 from graphene_django.types import DjangoObjectType
 
@@ -21,6 +21,10 @@ class WinnerType(DjangoObjectType):
         model = Winner
         fields = "__all__"
 
+class MessageType(DjangoObjectType):
+    class Meta:
+        model = Message
+        fields = "__all__"
 
 class TurnType(DjangoObjectType):
     class Meta:
