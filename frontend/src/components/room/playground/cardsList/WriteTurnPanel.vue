@@ -12,7 +12,7 @@
       v-else
       class="w-100"
       @click="sendCardChoice"
-      :type="'bg-disabled'"
+      :type="'bg-green'"
       :disabled="isDisabled"
       >{{ $t('room.card.send') }}</SubmitButton
     >
@@ -64,6 +64,7 @@ export default {
   },
   methods: {
     sendCardChoice() {
+      this.$emit('cardsAreSend');
       this.isLoading = true;
       this.$apollo
         .mutate({

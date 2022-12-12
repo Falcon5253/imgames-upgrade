@@ -1,14 +1,18 @@
 <template>
   <div id="cards-panel">
+    <div class="waiting-title" v-if="!canDoStepNowByCode || waitingForOthers">
+      {{ $t('room.card.waitingForOthers') }}
+    </div>
     <div class="cards-context">
       <h3 class="cards-title">{{ $t('room.card.cardsList') }}</h3>
-      <p class="current-budget">Оставшийся бюджет: {{ balance }} / {{ getMoneyPerMonth() }}</p>
+      <p class="current-budget">{{ $t('room.card.moneyLeft') }}: {{ balance }} / {{ getMoneyPerMonth() }}</p>
     </div>
     <WriteTurnPanel
       class="write-turn-panel"
-      :disabled="balance < 0"
+      :disabled="balance < 0 || (!canDoStepNowByCode || waitingForOthers)"
       :selectedCardsId="selectedCardsId"
       @clean="selectedCardsId = []"
+      @cardsAreSend="waitingForOthers = true"
     ></WriteTurnPanel>
     <div class="cards-list scrollable">
       <Card
@@ -16,7 +20,7 @@
         :key="card.id"
         :data="card"
         :selected="isSelected(card.id)"
-        :disabled="!canDoStepNowByCode"
+        :disabled="!canDoStepNowByCode || waitingForOthers"
         @select="addChoice($event)"
         @deselect="removeChoice($event)"
       ></Card>
@@ -68,6 +72,7 @@ export default {
       selectedCardsId: [],
       balance: 0,
       balanceIsPositive: true,
+      waitingForOthers: false,
     };
   },
   computed: {
@@ -76,6 +81,9 @@ export default {
     },
   },
   methods: {
+    waitingForOthersIsOver() {
+      this.waitingForOthers = false;
+    },
     addChoice(cardId) {
       if (!this.isSelected(cardId)) {
         this.selectedCardsId.push(+cardId);
@@ -116,6 +124,11 @@ export default {
     this.countBalance();
     this.checkBalance();
   },
+  mounted() {
+    this.$root.$on('awaitIsOver', () => {
+      this.waitingForOthersIsOver();
+    })
+  }
 };
 </script>
 
@@ -150,6 +163,10 @@ export default {
 
   & .write-turn-panel {
     margin: 0 0 0.5rem 0;
+  }
+  .waiting-title {
+    font-family: "PT Sans", sans-serif;
+    font-size: 1.17em;
   }
 }
 @media screen and (max-width: 610px) {

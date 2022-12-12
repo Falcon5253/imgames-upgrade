@@ -163,7 +163,7 @@ export default {
     return {
       skip: false,
       isPlayersMenuOpened: !(window.innerWidth <= 610),
-      isEffectsMenuOpened: false,
+      isEffectsMenuOpened: !(window.innerWidth <= 610),
       isChatOpened: false,
       isCardsListOpened: true,
       windowWidth: window.innerWidth,
@@ -354,7 +354,6 @@ export default {
       this.isPlayersMenuOpened = false;
       this.isEffectsMenuOpened = false;
       this.isChatOpened = false;
-      console.log(this.isAnyMenuShown);
     },
     openPlayersMenu() {
       this.closeMenuOpened();
@@ -381,6 +380,9 @@ export default {
       this.closeMenuOpened();
       this.isCardsListOpened = !this.isCardsListOpened;
     },
+    awaitIsOver() {
+      this.$root.$emit("awaitIsOver");
+    },
   },
   mounted() {
     this.$nextTick(() => {
@@ -401,6 +403,14 @@ export default {
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
   },
+  watch: {
+    currentMonthKey: {
+      handler(){
+        this.awaitIsOver();
+      },
+      immediate: true
+    }
+  }
 };
 </script>
 

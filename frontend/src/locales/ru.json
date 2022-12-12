@@ -40,6 +40,8 @@
     "mechanics": "Механика",
     "month": "Месяц",
     "card": {
+      "moneyLeft": "Оставшийся бюджет",
+      "waitingForOthers": "Ожидание других игроков...",
       "cardsList": "Список карточек",
       "chooseCard": "Выбрать",
       "selectedCard": "Выбранная карточка",

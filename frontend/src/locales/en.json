@@ -40,6 +40,8 @@
     "mechanics": "Flow",
     "month": "Month",
     "card": {
+      "moneyLeft": "Remaining budget",
+      "waitingForOthers": "Waiting for other players...",
       "cardsList": "List of cards",
       "chooseCard": "Select",
       "selectedCard": "Selected card",

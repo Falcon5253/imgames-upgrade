@@ -98,7 +98,8 @@ button {
   border-radius: 8px;
   background: transparent;
 }
-.bg-disabled {
+button:disabled {
+  cursor: default;
   border: 0px;
   background: linear-gradient(135deg, #707070 0%, #242424 100%);
   border-radius: 8px;
@@ -108,8 +109,5 @@ button {
   font-size: 14px;
   height: 40px;
   min-width: 100px;
-}
-button:disabled {
-  cursor: default;
 }
 </style>

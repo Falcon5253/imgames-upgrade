@@ -64,7 +64,7 @@ const store = new Vuex.Store({
             count: 1,
           });
         } else {
-          state.chosenCards[existCardIndex].count += 1;
+          state.chosenCards[existCardIndex].count += 1;     
         }
       }
     },
