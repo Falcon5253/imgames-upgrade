@@ -6,7 +6,7 @@
       :roomRound="currentRoundKey"
       :roomMonth="currentMonthKey"
     ></TopBar>
-    <div class="playField">
+    <div class="playField" v-bind:class="{ playField_fullScreen: !isAnyMenuShown }">
       <div
         class="mobile-fade"
         v-if="
@@ -42,6 +42,7 @@
         </template>
         <transition name="slide-fade" mode="out-in">
           <PlayersList
+            @closeMenu="closeMenuOpened"
             class="mobile-popup second-column-top"
             :players="players"
             :room="roomByCode"
@@ -61,6 +62,7 @@
         </transition>
         <transition name="slide-fade" mode="out-in">
           <Chat
+            @closeMenu="closeMenuOpened"
             class="mobile-popup second-column-full"
             v-if="isChatShown"
             :messages="getChatByRoomCode"
@@ -70,6 +72,7 @@
       <template v-else>
         <transition name="slide-fade" mode="out-in">
           <PlayersList
+            @closeMenu="closeMenuOpened"
             class="mobile-popup second-column-top"
             :players="players"
             :room="roomByCode"
@@ -89,6 +92,7 @@
         </transition>
         <transition name="slide-fade" mode="out-in">
           <Chat
+            @closeMenu="closeMenuOpened"
             :messages="getChatByRoomCode"
             class="mobile-popup second-column-full"
             v-if="isChatShown"
@@ -101,7 +105,7 @@
           @reloadRound="reloadRound()"
         ></FinishScreen>
       </template>
-      <div class="navigation">
+      <div class="navigation" v-bind:class="{ navigation_fullScreen: !isAnyMenuShown }">
         <div class="nav-btn" @click="openPlayersMenu">
           <img src="@/assets/icons/players.svg" alt="" />
           <p>{{ $t('room.navigation.players') }}</p>
@@ -167,25 +171,13 @@ export default {
   },
   computed: {
     isChatShown() {
-      if (this.isMobileScreen) {
-        return this.isChatOpened;
-      } else {
-        return !(this.isPlayersMenuShown || this.isEffectsMenuShown);
-      }
+      return this.isChatOpened;
     },
     isPlayersMenuShown() {
-      if (this.isMobileScreen) {
-        return this.isPlayersMenuOpened;
-      } else {
-        return !this.isChatOpened;
-      }
+      return this.isPlayersMenuOpened;
     },
     isEffectsMenuShown() {
-      if (this.isMobileScreen) {
-        return this.isEffectsMenuOpened;
-      } else {
-        return !this.isChatOpened;
-      }
+      return this.isEffectsMenuOpened;
     },
     roomCode() {
       return this.$route.params.roomCode;
@@ -234,6 +226,9 @@ export default {
     },
     isMobileScreen() {
       return this.windowWidth <= 610;
+    },
+    isAnyMenuShown() {
+      return this.isPlayersMenuOpened || this.isEffectsMenuOpened || this.isChatOpened;
     },
   },
   apollo: {
@@ -359,14 +354,21 @@ export default {
       this.isPlayersMenuOpened = false;
       this.isEffectsMenuOpened = false;
       this.isChatOpened = false;
+      console.log(this.isAnyMenuShown);
     },
     openPlayersMenu() {
       this.closeMenuOpened();
       this.isPlayersMenuOpened = true;
+      if (!this.isMobileScreen) {
+        this.isEffectsMenuOpened = true;
+      }
     },
     openEffectsMenu() {
       this.closeMenuOpened();
       this.isEffectsMenuOpened = true;
+      if (!this.isMobileScreen) {
+        this.isPlayersMenuOpened = true;
+      }
     },
     openChat() {
       this.closeMenuOpened();
@@ -429,7 +431,10 @@ export default {
     max-height: calc(100vh - 48px);
     column-gap: 20px;
     row-gap: 20px;
-
+    &_fullScreen {
+      grid-template-columns: 1fr 62px;
+      column-gap: 0px;
+    }
     & .first-column-top {
       grid-column-start: 1;
       grid-column-end: 2;
@@ -444,6 +449,7 @@ export default {
       grid-column-end: 2;
       grid-row-start: 2;
       grid-row-end: 3;
+      padding-right: 18px;
     }
     & .first-column-full {
       grid-column-start: 1;
@@ -491,6 +497,10 @@ export default {
       grid-column-end: 4;
       grid-row-start: 1;
       grid-row-end: 3;
+    }
+    & .navigation_fullScreen {
+      grid-column-start: 2;
+      grid-column-end: 3;
     }
   }
 }

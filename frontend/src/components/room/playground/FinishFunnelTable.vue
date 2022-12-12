@@ -102,6 +102,7 @@ export default {
 
 table.funnel-table {
   padding: 8px;
+  width: 98%;
 
   & tr {
     border: 0px;

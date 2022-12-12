@@ -1,6 +1,9 @@
 <template>
   <div class="chat-box">
-    <h3>{{ $t('room.player.chat') }}</h3>
+    <div class="chat-box__head">
+      <h3>{{ $t('room.player.chat') }}</h3>
+      <SubmitButton type="bg-blue" @click="collapse">Закрыть</SubmitButton>
+    </div>
     <div class="messages-box scrollable" ref="messagesBox">
       <template v-if="messages.length == 0">
         <p>Напишите первое сообщение!</p>
@@ -13,7 +16,7 @@
         >
           <div class="message normal-border-box">
             <small>{{ $t('room.player.you') }}</small>
-            {{ message.text }}
+            {{ message.text }} 
           </div>
           <div class="avatar">
             <img
@@ -66,7 +69,9 @@ export default {
     TextInput,
     SubmitButton,
   },
-  props: ["messages"],
+  props: {
+    messages: {type: Array},
+  },
   computed: {
     userId() {
       return this.$store.state.userId;
@@ -97,6 +102,9 @@ export default {
         this.newMessageText = '';
       }
     },
+    collapse() {
+      this.$emit('closeMenu');
+    }
   },
 }
 </script>
@@ -105,7 +113,6 @@ export default {
 .chat-box {
   display: flex;
   flex-direction: column;
-
   & .messages-box {
     height: 100%;
     min-height: 200px;
@@ -133,6 +140,13 @@ export default {
         margin-bottom: 0.25rem;
       }
     }
+  }
+  &__head {
+    display: flex;
+    width: 100%;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    justify-content: space-between;
   }
 
   & .input-box {

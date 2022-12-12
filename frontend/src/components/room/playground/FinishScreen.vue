@@ -278,6 +278,7 @@ export default {
 
   &-item {
     margin: auto;
+    width: 100%;
   }
 }
 .place-box {
