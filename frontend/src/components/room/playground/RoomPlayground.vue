@@ -358,9 +358,7 @@ export default {
     },
     startHighlightAnim() {
         this.highlight=true;
-        console.log(this.highlight);
         setTimeout(() => { this.highlight=false; }, 6000);
-        console.log(this.highlight);
     },
     closeMenuOpened() {
       this.isPlayersMenuOpened = false;

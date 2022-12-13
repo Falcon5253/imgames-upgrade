@@ -127,6 +127,9 @@ export default {
   mounted() {
     this.$root.$on('awaitIsOver', () => {
       this.waitingForOthersIsOver();
+      console.log(1);
+      this.$apollo.queries.canDoStepNowByCode.refresh();
+      console.log(2);
     })
   }
 };
