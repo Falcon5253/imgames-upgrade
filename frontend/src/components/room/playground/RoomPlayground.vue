@@ -5,6 +5,8 @@
       :roomCode="roomCode"
       :roomRound="currentRoundKey"
       :roomMonth="currentMonthKey"
+      :roomTotalMonths="roomTotalMonthsNumber"
+      :highlight="highlight"
     ></TopBar>
     <div class="playField" v-bind:class="{ playField_fullScreen: !isAnyMenuShown }">
       <div
@@ -167,6 +169,7 @@ export default {
       isChatOpened: false,
       isCardsListOpened: true,
       windowWidth: window.innerWidth,
+      highlight: false,
     };
   },
   computed: {
@@ -195,6 +198,9 @@ export default {
         }
       }
       return 0;
+    },
+    roomTotalMonthsNumber() {
+      return this.roomByCode.numberOfTurns;
     },
     flow() {
       if (this.roomByCode != undefined) {
@@ -350,6 +356,12 @@ export default {
       await this.$apollo.queries.currentRoundByCode.refresh();
       this.skip = false;
     },
+    startHighlightAnim() {
+        this.highlight=true;
+        console.log(this.highlight);
+        setTimeout(() => { this.highlight=false; }, 6000);
+        console.log(this.highlight);
+    },
     closeMenuOpened() {
       this.isPlayersMenuOpened = false;
       this.isEffectsMenuOpened = false;
@@ -407,6 +419,7 @@ export default {
     currentMonthKey: {
       handler(){
         this.awaitIsOver();
+        this.startHighlightAnim();
       },
       immediate: true
     }

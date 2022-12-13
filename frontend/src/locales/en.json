@@ -16,6 +16,17 @@
     "createNewRoom": "Create new room",
     "moneyPerMonth": "Money per month",
     "numberOfTurns": "Number of months",
+    "monthOfPeriod": "month of the period",
+    "periodIs": "period is",
+    "numberOfMonths": "months",
+    "monthNumber": {
+      "0": "beginning of period",
+      "1": "FIRST month of the period",
+      "2": "SECOND month of the period",
+      "3": "THIRD month of the period",
+      "4": "FORTH month of the period",
+      "5": "FIFTH month of the period"
+    },
     "roomsList": "Rooms list",
     "room": "Room",
     "goToRoom": "Jump into the room",
@@ -38,7 +49,6 @@
       "stageConversion": "Conversion of stage"
     },
     "mechanics": "Flow",
-    "month": "Month",
     "card": {
       "moneyLeft": "Remaining budget",
       "waitingForOthers": "Waiting for other players...",
