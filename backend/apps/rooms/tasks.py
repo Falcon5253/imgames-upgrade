@@ -98,13 +98,12 @@ def change_month_in_room(room_id):
             
         # Находим ходы за предыдущие месяца для проверки месяца применения карточек
         all_turns_of_user = []
-        all_months = Month.objects.filter(round=current_round)
+        all_months = Month.objects.filter(round=current_round).order_by('id')
         print(all_months)
         for month in all_months:
             try:
                 turn = Turn.objects.get(user=turn.user, month=month)
-                all_turns_of_user = [turn] + all_turns_of_user
-                print("id шагов:")
+                all_turns_of_user = all_turns_of_user + [turn]
                 print(turn.id)
             except Turn.DoesNotExist:
                 pass
@@ -135,7 +134,6 @@ def change_month_in_room(room_id):
         for turn in prev_month_users_turns:
             # Получаем набор выборов карточек за ход игрока
             user_card_choices = CardChoice.objects.filter(turn=turn)
-
             # Для каждого выбора карточек
             for choice in user_card_choices:
                 # По карточке в выборе находим все изменения параметров
@@ -147,6 +145,7 @@ def change_month_in_room(room_id):
                     # Если месяц применения не равен текущему месяцу или не равен нулю, то пропускаем карточку.
                     print(111111)
                     print(previous_turn_in_row)
+                    print(choice.card.id)
                     print(previous_turn_in_row[choice.card.id])
                     print(parameter_change.month_of_application)
                     if previous_turn_in_row[choice.card.id] < parameter_change.month_of_application:
