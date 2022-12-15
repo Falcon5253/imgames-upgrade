@@ -88,7 +88,6 @@ export default {
       if (!this.isSelected(cardId)) {
         this.selectedCardsId.push(+cardId);
         this.countBalance();
-        console.log(this.balanceIsPositive());
       }
     },
     removeChoice(cardId) {
@@ -99,7 +98,6 @@ export default {
           }
         );
         this.countBalance();
-        console.log(this.balanceIsPositive());
       }
     },
     isSelected(cardId) {
@@ -127,9 +125,7 @@ export default {
   mounted() {
     this.$root.$on('awaitIsOver', () => {
       this.waitingForOthersIsOver();
-      console.log(1);
       this.$apollo.queries.canDoStepNowByCode.refresh();
-      console.log(2);
     })
   }
 };

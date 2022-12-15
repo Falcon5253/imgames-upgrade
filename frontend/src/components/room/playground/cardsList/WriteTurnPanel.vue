@@ -86,7 +86,7 @@ export default {
           // console.log(chosenCards);
           for (let index = 0; index < chosenCards.length; index++) {
             const card = chosenCards[index];
-            console.log(chosenCards[index]);
+            // console.log(chosenCards[index]);
             this.$store.commit('ADD_CHOSEN_CARD', card);
           }
           this.$emit('clean');
