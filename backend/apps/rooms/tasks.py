@@ -99,22 +99,18 @@ def change_month_in_room(room_id):
         # Находим ходы за предыдущие месяца для проверки месяца применения карточек
         all_turns_of_user = []
         all_months = Month.objects.filter(round=current_round).order_by('id')
-        print(all_months)
         for month in all_months:
             try:
                 turn = Turn.objects.get(user=turn.user, month=month)
                 all_turns_of_user = all_turns_of_user + [turn]
-                print(turn.id)
             except Turn.DoesNotExist:
                 pass
-        print("конец id шагов")
 
 
         # Проверка предыдущих месяцев
         previous_turn_in_row = {}
         # Получаем все ходы пользователя
         for turn in all_turns_of_user:
-            print("ХОД!!!!!")
             current_turn_in_row = {}
             user_card_choices = CardChoice.objects.filter(turn=turn)
             # Получаем все выборы карт в ходе пользователя
@@ -122,9 +118,6 @@ def change_month_in_room(room_id):
                 current_turn_in_row.update({ card_choice.card.id: 1 })
                 if card_choice.card.id in previous_turn_in_row:
                     current_turn_in_row[card_choice.card.id] += previous_turn_in_row[card_choice.card.id]
-                print("Шаги подряд")
-                print(previous_turn_in_row)
-                print(current_turn_in_row)
             # Запоминаем, сколько раз подряд карточки применялись
             previous_turn_in_row = current_turn_in_row  
 
@@ -143,14 +136,8 @@ def change_month_in_room(room_id):
                 # Для каждого изменения параметра
                 for parameter_change in parameter_change_list:
                     # Если месяц применения не равен текущему месяцу или не равен нулю, то пропускаем карточку.
-                    print(111111)
-                    print(previous_turn_in_row)
-                    print(choice.card.id)
-                    print(previous_turn_in_row[choice.card.id])
-                    print(parameter_change.month_of_application)
                     if previous_turn_in_row[choice.card.id] < parameter_change.month_of_application:
                         continue
-                    print(222222)
                     # Если происходит изменение начального трафика канала
                     if parameter_change.type == "FSVL":
                         # Находим в вычисляемых значениях ChannelComputed
@@ -198,16 +185,20 @@ def change_month_in_room(room_id):
                 
                 # Ищем сумму финальных очков за предыдущие месяца
                 for month in all_month_of_the_round:
+                    if month.key == 0:
+                        continue
+                    
                     turn_of_the_month =  Turn.objects.filter(month=month).order_by('id')
-
+                    
                     for turn in turn_of_the_month:
+                        
                         computed_array = prepare_computed_game_data_array(
                             user=turn.user, room=room, current_month=month)
                         if turn.user.id not in total_points.keys():
                             total_points[turn.user.id] = 0.00
                         total_points[turn.user.id] += float(computed_array[-1].data[-1])
 
-                # Добавляем очки за следующие месяца
+                # Добавляем очки за последний месяц
                 print('ПОСЛЕДНИЙ МЕСЯЦ!!!')
                 for turn in prev_month_users_turns:
                     computed_array = prepare_computed_game_data_array(

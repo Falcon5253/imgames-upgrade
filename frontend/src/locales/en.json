@@ -25,7 +25,12 @@
       "2": "SECOND month of the period",
       "3": "THIRD month of the period",
       "4": "FORTH month of the period",
-      "5": "FIFTH month of the period"
+      "5": "FIFTH month of the period",
+      "6": "SIXTH month of the period",
+      "7": "SEVENTH month of the periond",
+      "8": "EIGHTH month of the periond",
+      "9": "NINTH month of the periond",
+      "10": "TENTH month of the periond"
     },
     "roomsList": "Rooms list",
     "room": "Room",

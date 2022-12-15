@@ -186,6 +186,8 @@ class Query(graphene.ObjectType):
                 months = Month.objects.filter(round=current_round)
                 total = 0
                 for month in months:
+                    if month.key == 0:
+                        continue
                     for channel in prepare_computed_game_data_array(room=room, user=user, current_month=month):
                         if channel.is_total == True:
                             total += int(float(channel.data[-1]))
