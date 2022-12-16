@@ -97,34 +97,49 @@ def change_month_in_room(room_id):
 
             
         # Находим ходы за предыдущие месяца для проверки месяца применения карточек
-        all_turns_of_user = []
+        all_users_turns = []
         all_months = Month.objects.filter(round=current_round).order_by('id')
         for month in all_months:
             try:
-                turn = Turn.objects.get(user=turn.user, month=month)
-                all_turns_of_user = all_turns_of_user + [turn]
+                turns = Turn.objects.filter(month=month).order_by('id')
+                all_users_turns = all_users_turns + [turn for turn in turns]
             except Turn.DoesNotExist:
                 pass
+        print(all_users_turns)
 
+        # Пересчитываем, сколько раз подряд использовались карточки
+        turns_in_row = {} # Хранит финальное количество, сколько раз подряд использовалась карточка
+        previous_month_turns = {} # Хранит временное количества между месяцами для подсчета
+        current_turn_in_row = {} # Хранит количество текущей итерации
+        month=-1
 
-        # Проверка предыдущих месяцев
-        previous_turn_in_row = {}
-        # Получаем все ходы пользователя
-        for turn in all_turns_of_user:
-            current_turn_in_row = {}
+        # Переберем все шаги раунда
+        for turn in all_users_turns:
+            if month != turn.month.id:
+                month = turn.month.id
+
+                for id in current_turn_in_row:
+                    previous_month_turns.update({ id : current_turn_in_row[id] })
+
+                current_turn_in_row = {}
+
             user_card_choices = CardChoice.objects.filter(turn=turn)
             # Получаем все выборы карт в ходе пользователя
+
+            current_turn_in_row.update({turn.user.id : {}})
             for card_choice in user_card_choices:
-                current_turn_in_row.update({ card_choice.card.id: 1 })
-                if card_choice.card.id in previous_turn_in_row:
-                    current_turn_in_row[card_choice.card.id] += previous_turn_in_row[card_choice.card.id]
-            # Запоминаем, сколько раз подряд карточки применялись
-            previous_turn_in_row = current_turn_in_row  
+                current_turn_in_row[turn.user.id].update({ card_choice.card.id: 1 })
+                turns_in_row = current_turn_in_row
+                if turn.user.id in previous_month_turns:
+                    if card_choice.card.id in previous_month_turns[turn.user.id]:
+                        current_turn_in_row[turn.user.id][card_choice.card.id] += previous_month_turns[turn.user.id][card_choice.card.id]
+                        turns_in_row = current_turn_in_row
 
 
         # 2. Для каждого изменения из-за карточек обновляем данные
         # Для каждого шага за последний месяц
         for turn in prev_month_users_turns:
+            print(turn.user)
             # Получаем набор выборов карточек за ход игрока
             user_card_choices = CardChoice.objects.filter(turn=turn)
             # Для каждого выбора карточек
@@ -136,7 +151,7 @@ def change_month_in_room(room_id):
                 # Для каждого изменения параметра
                 for parameter_change in parameter_change_list:
                     # Если месяц применения не равен текущему месяцу или не равен нулю, то пропускаем карточку.
-                    if previous_turn_in_row[choice.card.id] < parameter_change.month_of_application:
+                    if turns_in_row[turn.user.id][choice.card.id] < parameter_change.month_of_application:
                         continue
                     # Если происходит изменение начального трафика канала
                     if parameter_change.type == "FSVL":
@@ -188,9 +203,9 @@ def change_month_in_room(room_id):
                     if month.key == 0:
                         continue
                     
-                    turn_of_the_month =  Turn.objects.filter(month=month).order_by('id')
+                    turns_of_the_month =  Turn.objects.filter(month=month).order_by('id')
                     
-                    for turn in turn_of_the_month:
+                    for turn in turns_of_the_month:
                         
                         computed_array = prepare_computed_game_data_array(
                             user=turn.user, room=room, current_month=month)
@@ -214,17 +229,18 @@ def change_month_in_room(room_id):
 
                 for value in total_points.values():
                     sorted_values += [int(value)]
-                    sorted_values = sorted(sorted_values)
+                sorted_values = sorted(sorted_values, reverse=True)
+                print("values: " + str(sorted_values))
 
-                for i in sorted_values:
-                    for k in total_points.keys():
-                        if total_points[k] == i:
-                            sorted_total_points[k] = total_points[k]
+                for value in sorted_values:
+                    for id in total_points.keys():
+                        if total_points[id] == value:
+                            sorted_total_points.update({ id: value })
                             break
-                        
+                print("total points: " + str(sorted_total_points))
                 place = 0
                 # Заполнить победителей в БД
-                for user_id in total_points:
+                for user_id in sorted_total_points:
                     place += 1
                     if place > 3:
                         break
