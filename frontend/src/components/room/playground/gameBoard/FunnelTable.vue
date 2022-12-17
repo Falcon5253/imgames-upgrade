@@ -93,7 +93,6 @@ export default {
   watch: {
     computedChannelsByCode: {
       handler() {
-        console.log(111);
         this.$root.$emit("refreshRound");
       },
       immediate: true,

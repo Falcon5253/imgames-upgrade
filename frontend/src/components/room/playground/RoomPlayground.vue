@@ -410,7 +410,6 @@ export default {
         this.$router.push(MAIN_PATH);
     });
     this.$root.$on('refreshRound', () => {
-      console.log("ЭЭЭЭх")
       this.$apollo.queries.currentRoundByCode.refresh();
     })
   },
