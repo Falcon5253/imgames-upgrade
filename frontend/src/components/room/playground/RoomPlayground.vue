@@ -408,7 +408,11 @@ export default {
       .then(() => {})
       .catch(() => {
         this.$router.push(MAIN_PATH);
-      });
+    });
+    this.$root.$on('refreshRound', () => {
+      console.log("ЭЭЭЭх")
+      this.$apollo.queries.currentRoundByCode.refresh();
+    })
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
