@@ -44,9 +44,9 @@ def prepare_computed_game_data_array(room, user, current_month=None):
             for i, stage in enumerate(stages, start=0):
 
                 # Высчитываем значение после конверсии
-                channel_next = ceil(channel_next * stage.conversion)
+                channel_next = ceil(channel_next * stage.conversion) # Уточнить на конверсию какого канала умножается / может ли она применяться ко многим каналам?
 
-                #
+                # А МЕНЯЕТСЯ ТО ТОЛЬКО НАЧАЛЬНОЕ ЗНАЧЕНИЕ ОКАЗЫВАЕТСЯ
                 total_data[1+(2*i)] = '{0:.2f}'.format(
                     Decimal(total_data[1+(2*i)])+Decimal(0))
                 total_data[2+(2*i)] = '{0:.2f}'.format(

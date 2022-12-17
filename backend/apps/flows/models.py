@@ -65,6 +65,7 @@ class Stage(models.Model):
             MaxValueValidator(100.00),
             MinValueValidator(0.01)
         ])
+    # Приделать связь с каналом
 
     class Meta:
         verbose_name = "Этап воронки"
