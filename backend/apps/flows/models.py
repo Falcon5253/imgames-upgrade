@@ -1,6 +1,8 @@
 from django.db import models
 from apps.organizations.models import Organization
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
+from django import forms
 
 MATH_OPERATOR_SELECTION = [
     ('+', '[+] Сложение'),
@@ -58,14 +60,13 @@ class StageInSequence(models.Model):
 class Stage(models.Model):
     """Этап"""
     flow = models.ForeignKey("Flow", verbose_name="Принадлежность к механике",
-                             on_delete=models.CASCADE)
+                            on_delete=models.CASCADE)
     name = models.CharField("Название этапа", max_length=255)
     conversion = models.DecimalField(
-        "Начальная конверсия", decimal_places=2, max_digits=5, validators=[
+        "Стандартная конверсия на этапе", decimal_places=2, max_digits=5, validators=[
             MaxValueValidator(100.00),
             MinValueValidator(0.01)
         ])
-    # Приделать связь с каналом
 
     class Meta:
         verbose_name = "Этап воронки"
@@ -102,7 +103,7 @@ class Stage(models.Model):
 class Channel(models.Model):
     """Канал"""
     flow = models.ForeignKey("Flow", verbose_name="Принадлежность к механике",
-                             on_delete=models.CASCADE)
+                            on_delete=models.CASCADE)
     name = models.CharField("Название параметра", max_length=255)
     default_value = models.DecimalField(
         "Начальное значение", decimal_places=2, max_digits=10)
@@ -113,6 +114,24 @@ class Channel(models.Model):
 
     def __str__(self):
         return "'"+self.name+"'"+" (#"+str(self.id)+")"
+
+
+class StageOfChannel(models.Model):
+    """Этап для конкретных каналов"""
+    stage = models.ForeignKey(Stage, verbose_name="Принадлежность к стадии", on_delete=models.CASCADE)
+    conversion = models.DecimalField(
+        "Конверсия канала", decimal_places=2, max_digits=5, validators=[
+            MaxValueValidator(100.00),
+            MinValueValidator(0.01)
+        ])
+    channels = models.ManyToManyField(Channel, blank=True, max_length=255, verbose_name='Принадлежность конверсии к каналам')
+
+    class Meta:
+        verbose_name = "Конверсия определенного канала"
+        verbose_name_plural = "Конверсии определенных каналов"
+
+    def __str__(self):
+        return f'Конверсия канала "{str(self.id)}" этапа "{str(self.stage)}"'
 
 
 class Card(models.Model):
@@ -144,3 +163,42 @@ class Flow(models.Model):
 
     def __str__(self):
         return f'{self.title} - {str(self.organization)} (#{str(self.pk)})'
+
+# Проверяем, чтобы на одном этапе "этапы канала" не имели общих каналов
+class StageOfChannelForm(forms.ModelForm):
+    def clean(self):
+        channels_id = self.data.getlist('channels')
+        stage_id = self.data.get('stage')
+        stage = Stage.objects.get(id=stage_id)
+        stages_of_channels = StageOfChannel.objects.filter(stage=stage)
+        for channel_id in channels_id:
+
+            channel= Channel.objects.get(id=channel_id)
+            print(channel)
+            stage_of_channel = stages_of_channels.filter(channels=channel)
+            if len(stage_of_channel) > 0:
+                if stage_of_channel[0] == self.instance:
+                    print("Hi me")
+                    continue
+            if stage_of_channel.exists():
+                raise ValidationError("Для выбранного вами канала на выбранной вами стадии конвервия уже была определена")
+
+        # for stage_of_channel in stages_of_channels:
+        #     if self.instance == stage_of_channel:
+        #         pass
+        #     for channel_id in channels_id:
+        #         print(stage_of_channel.channels.all())
+        # for stage in stages:
+
+        # print(others)
+
+# Проверяем, чтобы имя у этапа было уникальным среди этапов определенной механики
+class StageForm(forms.ModelForm):
+    def clean(self):
+        flow_id = self.data.get('flow')
+        name = self.data.get('name')
+        flow = Flow.objects.get(id=flow_id)
+        stages = Stage.objects.filter(flow=flow)
+        for stage in stages:
+            if stage.name == name:
+                raise ValidationError('Этап с таким именем в выбранной механике уже существует!')

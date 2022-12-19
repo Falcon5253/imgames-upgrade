@@ -232,11 +232,14 @@ def change_month_in_room(room_id):
                 sorted_values = sorted(sorted_values, reverse=True)
                 print("values: " + str(sorted_values))
 
+                print(total_points.keys())
                 for value in sorted_values:
+                    print("value: " + str(value))
                     for id in total_points.keys():
+                        print(id)
+                        print(total_points[id])
                         if total_points[id] == value:
                             sorted_total_points.update({ id: value })
-                            break
                 print("total points: " + str(sorted_total_points))
                 place = 0
                 # Заполнить победителей в БД

@@ -1,4 +1,4 @@
-from apps.flows.models import Flow, Card, Channel, StageInSequence, Stage, ParameterChange
+from apps.flows.models import Flow, Card, Channel, StageInSequence, Stage, ParameterChange, StageOfChannel
 from graphene_django.types import DjangoObjectType
 
 
@@ -29,6 +29,11 @@ class StageInSequenceType(DjangoObjectType):
 class StageType(DjangoObjectType):
     class Meta:
         model = Stage
+        fields = "__all__"
+
+class StageOfChannelType(DjangoObjectType):
+    class Meta:
+        model = StageOfChannel
         fields = "__all__"
 
 
