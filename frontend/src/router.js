@@ -19,7 +19,7 @@ import {
 
 import verifyToken from '@/graphql/mutations/verifyToken.gql';
 
-function verifyAuth(to, from) {
+export function verifyAuth(to, from) {
   store.commit('START_LOADING');
   let provider = createProvider();
   return new Promise(function (resolve, reject) {

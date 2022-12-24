@@ -40,6 +40,7 @@ import TextInput from '@/components/ui/TextInput.vue';
 import SubmitButton from '@/components/ui/SubmitButton.vue';
 import TopBar from '@/components/ui/TopBar.vue';
 import login from '@/graphql/mutations/login.gql';
+import { verifyAuth } from '@/router';
 
 export default {
   name: 'AuthView',
@@ -69,6 +70,7 @@ export default {
         .then((data) => {
           this.$store.commit('SET_IS_AUTHENTICATED', true);
           this.$store.commit('SET_GOT_VERIFIED_AUTH', true);
+          verifyAuth();
           this.$router.push(MAIN_PATH).catch((err) => {
             console.log(err);
           });
@@ -78,6 +80,7 @@ export default {
         })
         .finally(() => {
           this.$store.commit('STOP_LOADING');
+          // location.reload();
         });
     },
   },
