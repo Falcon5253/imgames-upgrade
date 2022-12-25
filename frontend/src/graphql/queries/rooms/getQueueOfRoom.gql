@@ -1,0 +1,11 @@
+query ($code: String!) {
+  getQueueOfRoom(code: $code) {
+    id
+    participant {
+      id
+      __typename
+    }
+    madeTurn
+    __typename
+  }
+}

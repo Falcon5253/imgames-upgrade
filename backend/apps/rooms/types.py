@@ -1,5 +1,5 @@
 import graphene
-from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant, Message
+from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant, Message, Queue
 from apps.organizations.models import Organization
 from graphene_django.types import DjangoObjectType
 
@@ -61,4 +61,9 @@ class RoomType(DjangoObjectType):
 
     class Meta:
         model = Room
+        fields = "__all__"
+
+class QueueType(DjangoObjectType):
+    class Meta:
+        model = Queue
         fields = "__all__"

@@ -137,6 +137,10 @@ import currentRoundUpdated from '@/graphql/subscriptions/rooms/currentRoundUpdat
 import connectRoom from '@/graphql/mutations/rooms/connectRoom.gql';
 import roomParticipants from '@/graphql/queries/rooms/roomParticipants.gql';
 import roomParticipantsUpdated from '@/graphql/subscriptions/rooms/roomParticipantsUpdated.gql';
+import getQueueOfRoom from '@/graphql/queries/rooms/getQueueOfRoom.gql';
+import queueUpdated from '@/graphql/subscriptions/rooms/queueUpdated.gql';
+import isRoundStarted from '@/graphql/queries/rooms/isRoundStarted.gql';
+import roundActivityUpdated from '@/graphql/subscriptions/rooms/roundActivityUpdated.gql';
 import PlayersList from '@/components/room/playground/PlayersList.vue';
 import EffectsList from '@/components/room/playground/EffectsList.vue';
 import GameBoard from '@/components/room/playground/gameBoard/GameBoard.vue';
@@ -218,15 +222,19 @@ export default {
       }
       return [];
     },
-    roomIsActive() {
-      if (this.currentRoundByCode != undefined) {
-        return this.currentRoundByCode.isActive;
+    queue() {
+      if (this.getQueueOfRoom != undefined) {
+        return this.getQueueOfRoom;
       }
-      return false;
+    },
+    roomIsActive() {
+      if (this.isRoundStarted != undefined) {
+        return this.isRoundStarted[0];
+      }
     },
     roomIsFinished() {
       if (this.currentRoundByCode != undefined) {
-        return this.currentRoundByCode.isFinished;
+        return this.isRoundStarted[1];
       }
       return false;
     },
@@ -348,6 +356,51 @@ export default {
         },
       },
     },
+    getQueueOfRoom: {
+      query: getQueueOfRoom,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+      subscribeToMore: {
+        document: queueUpdated,
+        variables() {
+          return {
+            code: this.roomCode,
+          };
+        },
+        skip() {
+          return this.skip;
+        },
+        updateQuery: (previousResult, { subscriptionData }) => {
+          return previousResult;
+        },
+      },
+    },
+    isRoundStarted: {
+      query: isRoundStarted,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+      // subscribeToMore: {
+      //   document: roundActivityUpdated,
+      //   variables() {
+      //     return {
+      //       code: this.roomCode,
+      //     };
+      //   },
+      //   skip() {
+      //     return this.skip;
+      //   },
+      //   updateQuery: (previousResult, { subscriptionData }) => {
+      //     console.log(previousResult)
+      //     return previousResult;
+      //   },
+      // },
+    }
   },
   methods: {
     async reloadRound() {
@@ -424,13 +477,18 @@ export default {
       },
       immediate: true
     },
-  //   roomIsActive: {
-  //     handler() {
-  //       console.log(2);
-  //       // this.$apollo.queries.currentRoundByCode.refresh();
-  //     },
-  //     immediate: true
-  //   },
+    getQueueOfRoom: {
+      async handler() {
+        await this.$apollo.queries.isRoundStarted.refetch();
+      },
+      immediate: true
+    },
+    currentRoundByCode: {
+      async handler() {
+        await this.$apollo.queries.isRoundStarted.refetch();
+      },
+      immediate: true
+    }
   //   roomByCode: { 
   //    async handler() {
   //       console.log(3);

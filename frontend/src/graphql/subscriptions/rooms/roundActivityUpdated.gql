@@ -1,0 +1,3 @@
+subscription ($code: String!) {
+  roundActivityUpdated(code: $code)
+}
