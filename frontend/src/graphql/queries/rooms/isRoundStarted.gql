@@ -1,3 +1,0 @@
-query ($code: String!) {
-  isRoundStarted(code: $code)
-}

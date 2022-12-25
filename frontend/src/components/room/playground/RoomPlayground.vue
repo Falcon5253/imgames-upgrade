@@ -139,8 +139,7 @@ import roomParticipants from '@/graphql/queries/rooms/roomParticipants.gql';
 import roomParticipantsUpdated from '@/graphql/subscriptions/rooms/roomParticipantsUpdated.gql';
 import getQueueOfRoom from '@/graphql/queries/rooms/getQueueOfRoom.gql';
 import queueUpdated from '@/graphql/subscriptions/rooms/queueUpdated.gql';
-import isRoundStarted from '@/graphql/queries/rooms/isRoundStarted.gql';
-import roundActivityUpdated from '@/graphql/subscriptions/rooms/roundActivityUpdated.gql';
+import monthById from '@/graphql/queries/rooms/monthById.gql';
 import PlayersList from '@/components/room/playground/PlayersList.vue';
 import EffectsList from '@/components/room/playground/EffectsList.vue';
 import GameBoard from '@/components/room/playground/gameBoard/GameBoard.vue';
@@ -196,10 +195,14 @@ export default {
       return 0;
     },
     currentMonthKey() {
+      if (this.monthById != undefined) {
+        return this.monthById.key;
+      }
+      return 0;
+    },
+    currentMonthId() {
       if (this.currentRoundByCode != undefined) {
-        if (this.currentRoundByCode.currentMonth != undefined) {
-          return this.currentRoundByCode.currentMonth.key;
-        }
+        return this.currentRoundByCode.currentMonthId;
       }
       return 0;
     },
@@ -228,13 +231,14 @@ export default {
       }
     },
     roomIsActive() {
-      if (this.isRoundStarted != undefined) {
-        return this.isRoundStarted[0];
+      if (this.currentRoundByCode != undefined) {
+        return this.currentRoundByCode.isActive;
       }
+      return false;
     },
     roomIsFinished() {
       if (this.currentRoundByCode != undefined) {
-        return this.isRoundStarted[1];
+        return this.currentRoundByCode.isFinished;
       }
       return false;
     },
@@ -324,6 +328,14 @@ export default {
         },
       },
     },
+    monthById: {
+      query: monthById,
+      variables() {
+        return {
+          id: this.currentMonthId,
+        };
+      },
+    },
     roomParticipants: {
       query: roomParticipants,
       variables() {
@@ -378,32 +390,10 @@ export default {
         },
       },
     },
-    isRoundStarted: {
-      query: isRoundStarted,
-      variables() {
-        return {
-          code: this.roomCode,
-        };
-      },
-      // subscribeToMore: {
-      //   document: roundActivityUpdated,
-      //   variables() {
-      //     return {
-      //       code: this.roomCode,
-      //     };
-      //   },
-      //   skip() {
-      //     return this.skip;
-      //   },
-      //   updateQuery: (previousResult, { subscriptionData }) => {
-      //     console.log(previousResult)
-      //     return previousResult;
-      //   },
-      // },
-    }
   },
   methods: {
     async reloadRound() {
+      console.log("RELOADING")
       this.skip = true;
       await this.$apollo.queries.roomByCode.refresh();
       await this.$apollo.queries.currentRoundByCode.refresh();
@@ -449,7 +439,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      window.addEventListener('resize', this.onResize);
+      this.window.addEventListener('resize', this.onResize);
     });
     this.$apollo
       .mutate({
@@ -465,6 +455,7 @@ export default {
     this.$root.$on('refreshRound', () => {
       this.$apollo.queries.currentRoundByCode.refresh();
     });
+    window.addEventListener('onfocus', alert("Hi"));
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
@@ -479,24 +470,16 @@ export default {
     },
     getQueueOfRoom: {
       async handler() {
-        await this.$apollo.queries.isRoundStarted.refetch();
+        await this.$apollo.queries.currentRoundByCode.refresh();
       },
       immediate: true
     },
-    currentRoundByCode: {
-      async handler() {
-        await this.$apollo.queries.isRoundStarted.refetch();
-      },
-      immediate: true
-    }
-  //   roomByCode: { 
-  //    async handler() {
-  //       console.log(3);
-  //       await this.$apollo.queries.currentRoundByCode.refresh();
-  //       // await this.$apollo.queries.roomByCode.refresh();
-  //    },
-  //    immediate: true
-  //  },
+    roomByCode: { 
+     async handler() {
+        reloadRound();
+     },
+     immediate: true
+   },
   }
 };
 </script>

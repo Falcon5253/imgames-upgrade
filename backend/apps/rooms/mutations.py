@@ -163,6 +163,14 @@ class StartRound(graphene.Mutation):
                 participants = RoomParticipant.objects.filter(room=room)
                 for participant in participants:
                     Queue.objects.get_or_create(room=room, participant=participant)
+                
+                # Ставим, что был сделан ход и сразу его обнуляем
+                participant = RoomParticipant.objects.get(room=room, user=user)
+                queue = Queue.objects.get(room=room, participant=participant)
+                queue.made_turn = True
+                queue.save()
+                queue.made_turn = False
+                queue.save()
 
                 return StartRound(success=True)
         except Exception as e:

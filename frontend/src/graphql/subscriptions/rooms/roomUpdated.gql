@@ -4,38 +4,9 @@ subscription ($code: String!) {
     code
     numberOfTurns
     moneyPerMonth
-    currentRound {
-      id
-      key
-      isActive
-      isFinished
-      currentMonth {
-        id
-        key
-      }
-      __typename
-    }
-    roomOwner {
-      id
-      lastName
-      firstName
-      __typename
-    }
-    roomparticipantSet {
-      id
-      user {
-        id
-        lastName
-        firstName
-        __typename
-      }
-      __typename
-    }
-    flow {
-      id
-      title
-      __typename
-    }
+    currentRoundId
+    roomOwnerId
+    flowId
     __typename
   }
 }

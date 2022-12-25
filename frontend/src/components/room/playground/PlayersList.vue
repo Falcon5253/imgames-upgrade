@@ -37,12 +37,10 @@ export default {
   },
   computed: {
     roomOwnerId() {
-      if (this.room.roomOwner != undefined) {
-        if (this.room.roomOwner.id != undefined) {
-          return +this.room.roomOwner.id;
-        }
+      if (this.room.roomOwnerId != undefined) {
+        return this.room.roomOwnerId
       }
-      return {};
+      return 0;
     },
   },
   methods: {

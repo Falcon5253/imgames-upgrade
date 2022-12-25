@@ -1,7 +1,7 @@
 import graphene
 from graphene_django.debug import DjangoDebug
 from apps.rooms.mutations import CreateRoom, WriteTurn, StartRound, ReStartRound, ConnectRoom, SendMessage
-from apps.rooms.types import RoomType, RoundType, RoomParticipantType, TurnType, WinnerType, MessageType, QueueType
+from apps.rooms.types import RoomType, RoundType, RoomParticipantType, TurnType, WinnerType, MessageType, QueueType, MonthType
 from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner, Message, Queue
 import json
 from apps.organizations.models import Organization
@@ -30,19 +30,11 @@ class Query(graphene.ObjectType):
     ), description='Список победителей в комнате за текущий раунд')
     get_chat_by_room_code = graphene.List(MessageType, code=graphene.String(), description='Сообщения чата комнаты')
     get_queue_of_room = graphene.List(QueueType, code=graphene.String(), description='Очередь в комнате')
-    is_round_started = graphene.List(graphene.Boolean,
-        code=graphene.String(), description='Запустился ли новый раунд')
+    month_by_id = graphene.Field(MonthType, id=graphene.Int(), description='Месяц')
 
-    def resolve_is_round_started(self, info, code):
+    def resolve_month_by_id(self, info, id):
         try:
-            code_array = str(code).split('-')
-            if len(code_array) > 1:
-                organization = Organization.objects.get(
-                    prefix__iexact=code_array[0])
-                room = Room.objects.get(
-                    key=code_array[1], organization=organization)
-                is_finished = room.number_of_turns == room.current_round.current_month.key
-                return [room.current_round.is_active, is_finished]
+            return Month.objects.get(id=id)
         except Exception as e:
             return None
 
@@ -239,15 +231,6 @@ def filter_queue_updated_events(event, room):
     except Exception as e:
         return False
 
-# def filter_round_activity_updated_events(event, room):
-#     try:
-#         return isinstance(event.instance, Round) and (event.instance.room.pk == int(room.id))
-#     except Exception as e:
-#         return False
-
-def myPrint(obj):
-    print("MyPrint")
-    print(obj)
 
 
 class Subscription(graphene.ObjectType):
@@ -286,17 +269,6 @@ class Subscription(graphene.ObjectType):
         except Exception as e:
             return None
 
-    # def resolve_round_activity_updated(self, info, code):
-    #     try:
-    #         code_array = str(code).split('-')
-    #         if len(code_array) > 1:
-    #             organization = Organization.objects.get(
-    #                 prefix__iexact=code_array[0])
-    #             room = Room.objects.get(
-    #                 key=code_array[1], organization=organization)
-    #             return self.filter(lambda event: filter_round_events(event, room)).map(lambda event: event.instance)
-    #     except Exception as e:
-    #         return None
 
     # Подписка на обновление чата
     def resolve_chat_updated(self, info, code):
