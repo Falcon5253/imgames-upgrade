@@ -1,5 +1,5 @@
 import graphene
-from .models import Room, Round, Month, Turn, CardChoice, RoomParticipant, Message
+from .models import Room, Round, Month, Turn, CardChoice, RoomParticipant, Message, Queue
 
 from apps.organizations.models import Organization
 from apps.flows.models import Flow, Card
@@ -103,13 +103,30 @@ class WriteTurn(graphene.Mutation):
                     card = Card.objects.get(pk=card_id)
                     CardChoice.objects.create(card=card, turn=turn)
 
-                # Проверяем, если все сделали ход
-                turns_count = Turn.objects.filter(
-                    month=current_month).count()
-                participants_count = RoomParticipant.objects.filter(
-                    room=room).count()
-                if turns_count >= participants_count:
-                    task = change_month_in_room.delay(room.id)
+                # Записываем шаг в очередь
+                room_participant = RoomParticipant.objects.get(room=room, user=user)
+                try:
+                    queue = Queue.objects.get(room=room, participant=room_participant)
+                    queue.made_turn = True
+                    queue.save()
+                except:                  
+                    queue = Queue.objects.create(room=room, participant=room_participant, made_turn=False)
+
+                queues = Queue.objects.filter(room=room)
+                for queue in queues:
+                    # Если есть кто-то, кто не сделал ход, возвращаем результат
+                    if queue.made_turn == False:  
+                        return WriteTurn(turn=turn, success=True)
+                
+                # Меняем месяц если все сделали ход
+                task = change_month_in_room.delay(room.id)
+
+                # Обнуляем их шаги, если был не последний месяц
+                key = current_month.key
+                if not (Month.objects.filter(key=key+2, round=current_round).count() == 0):
+                    for queue in queues:
+                        queue.made_turn = False
+                        queue.save()
 
                 # Возвращаем результат
                 return WriteTurn(turn=turn, success=True)
@@ -141,6 +158,12 @@ class StartRound(graphene.Mutation):
                         raise Exception('Already started!')
                     current_round.is_active = True
                     current_round.save()
+                
+                # При начале раунда у каждого игрока в очереди должна быть запись
+                participants = RoomParticipant.objects.filter(room=room)
+                for participant in participants:
+                    Queue.objects.get_or_create(room=room, participant=participant)
+
                 return StartRound(success=True)
         except Exception as e:
             return StartRound(success=False, errors=[str(e)])
@@ -200,6 +223,13 @@ class ReStartRound(graphene.Mutation):
 
                     new_round.current_month = first_month
                     new_round.save()
+
+                    # Обнуляем ходы в очереди у участников
+                    participants = RoomParticipant.objects.filter(room=room)
+                    for participant in participants:
+                        queue = Queue.objects.get(room=room, participant=participant)
+                        queue.made_turn = False
+                        queue.save()
 
                     room.current_round = new_round
                     room.save()

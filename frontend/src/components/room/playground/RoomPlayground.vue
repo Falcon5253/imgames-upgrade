@@ -356,7 +356,7 @@ export default {
       await this.$apollo.queries.currentRoundByCode.refresh();
       this.skip = false;
     },
-    startHighlightAnim() {
+    async startHighlightAnim() {
         this.highlight=true;
         setTimeout(() => { this.highlight=false; }, 6000);
     },
@@ -424,20 +424,21 @@ export default {
       },
       immediate: true
     },
-    roomByCode: {
-      handler() {
-        console.log(2);
-        this.$apollo.queries.currentRoundByCode.refresh();
-      },
-      immediate: true
-    },
-    currentRoundByCode: {
-      handler() {
-        console.log(3);
-        this.$apollo.queries.roomByCode.refresh();
-      },
-      immediate: true
-    },
+  //   roomIsActive: {
+  //     handler() {
+  //       console.log(2);
+  //       // this.$apollo.queries.currentRoundByCode.refresh();
+  //     },
+  //     immediate: true
+  //   },
+  //   roomByCode: { 
+  //    async handler() {
+  //       console.log(3);
+  //       await this.$apollo.queries.currentRoundByCode.refresh();
+  //       // await this.$apollo.queries.roomByCode.refresh();
+  //    },
+  //    immediate: true
+  //  },
   }
 };
 </script>

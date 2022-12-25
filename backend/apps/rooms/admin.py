@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant, Message
+from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant, Message, Queue
 
 
 @admin.register(Winner)
@@ -12,6 +12,10 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ( 'room', 'user', 'text', 'created_at')
     # list_display_links = ('place', 'user')
 
+@admin.register(Queue)
+class QueueAdmin(admin.ModelAdmin):
+    list_display = ( 'id', 'room', 'participant', 'made_turn')
+    # list_display_links = ('place', 'user')
 
 @admin.register(Turn)
 class TurnAdmin(admin.ModelAdmin):

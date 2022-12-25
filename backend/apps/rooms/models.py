@@ -182,6 +182,18 @@ class RoomParticipant(models.Model):
     def __str__(self):
         return f"Участник #{str(self.id)}"
 
+
+class Queue(models.Model):
+    """Очередь комнаты"""
+    room = models.ForeignKey(
+        Room, verbose_name="Комната", on_delete=models.CASCADE)
+    participant = models.ForeignKey(RoomParticipant, verbose_name="Участник", on_delete=models.CASCADE)
+    made_turn = models.BooleanField(verbose_name="Ход сделан", default=False)
+    class Meta:
+        verbose_name = "Участник в очереди"
+        verbose_name_plural = "Участники в очереди"
+
+
 class Message(models.Model):
     """"Сообщения"""
     room = models.ForeignKey(
