@@ -2,13 +2,13 @@ query ($code: String!) {
   currentRoundByCode(code: $code) {
     id
     key
-    isActive
-    isFinished
     currentMonth {
       id
       key
       __typename
     }
+    isActive
+    isFinished
     __typename
   }
 }

@@ -4,6 +4,17 @@ query ($code: String!) {
     code
     numberOfTurns
     moneyPerMonth
+    currentRound {
+      id
+      key
+      isActive
+      isFinished
+      currentMonth {
+        id
+        key
+      }
+      __typename
+    }
     roomOwner {
       id
       lastName

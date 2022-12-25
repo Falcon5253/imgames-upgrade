@@ -411,7 +411,7 @@ export default {
     });
     this.$root.$on('refreshRound', () => {
       this.$apollo.queries.currentRoundByCode.refresh();
-    })
+    });
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
@@ -423,7 +423,21 @@ export default {
         this.startHighlightAnim();
       },
       immediate: true
-    }
+    },
+    roomByCode: {
+      handler() {
+        console.log(2);
+        this.$apollo.queries.currentRoundByCode.refresh();
+      },
+      immediate: true
+    },
+    currentRoundByCode: {
+      handler() {
+        console.log(3);
+        this.$apollo.queries.roomByCode.refresh();
+      },
+      immediate: true
+    },
   }
 };
 </script>

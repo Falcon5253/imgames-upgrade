@@ -3,6 +3,7 @@ subscription ($code: String!) {
     id
     code
     numberOfTurns
+    moneyPerMonth
     currentRound {
       id
       key
