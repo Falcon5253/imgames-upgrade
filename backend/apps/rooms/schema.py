@@ -1,9 +1,8 @@
 import graphene
 from graphene_django.debug import DjangoDebug
 from apps.rooms.mutations import CreateRoom, WriteTurn, StartRound, ReStartRound, ConnectRoom, SendMessage
-from apps.rooms.types import RoomType, RoundType, RoomParticipantType, TurnType, WinnerType, MessageType, QueueType, MonthType
-from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner, Message, Queue
-import json
+from apps.rooms.types import RoomType, RoundType, RoomParticipantType, TurnType, WinnerType, MessageType,  MonthType
+from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner, Message
 from apps.organizations.models import Organization
 from graphene_subscriptions.events import CREATED, UPDATED, DELETED
 from apps.rooms.tasks import MONTH_EVENT
@@ -29,14 +28,6 @@ class Query(graphene.ObjectType):
     winners_from_current_round = graphene.List(WinnerType, code=graphene.String(
     ), description='Список победителей в комнате за текущий раунд')
     get_chat_by_room_code = graphene.List(MessageType, code=graphene.String(), description='Сообщения чата комнаты')
-    get_queue_of_room = graphene.List(QueueType, code=graphene.String(), description='Очередь в комнате')
-    month_by_id = graphene.Field(MonthType, id=graphene.Int(), description='Месяц')
-
-    def resolve_month_by_id(self, info, id):
-        try:
-            return Month.objects.get(id=id)
-        except Exception as e:
-            return None
 
     def resolve_room_participants(self, info, code):
         try:
@@ -51,18 +42,6 @@ class Query(graphene.ObjectType):
         except Exception as e:
             return None
 
-    def resolve_get_queue_of_room(self, info, code):
-        try:
-            code_array = str(code).split('-')
-            if len(code_array) > 1:
-                user = info.context.user
-                organization = Organization.objects.get(
-                    prefix__iexact=code_array[0])
-                room = Room.objects.get(
-                    key=code_array[1], organization=organization)
-                return Queue.objects.filter(room=room)
-        except Exception as e:
-            return None
 
     def resolve_can_do_step_now_by_code(self, info, code):
         try:
@@ -225,21 +204,12 @@ def filter_chat_updated_events(event, room):
     except Exception as e:
         return False
 
-def filter_queue_updated_events(event, room):
-    try:
-        return isinstance(event.instance, Queue) and (event.instance.room.pk == int(room.id))
-    except Exception as e:
-        return False
-
-
 
 class Subscription(graphene.ObjectType):
     room_updated = graphene.Field(RoomType, code=graphene.String())
     chat_updated = graphene.Field(MessageType, code=graphene.String())
     current_round_updated = graphene.Field(RoundType, code=graphene.String())
     room_participants_updated = graphene.Field(RoomParticipantType, code=graphene.String())
-    queue_updated = graphene.Field(QueueType, code=graphene.String())
-    # round_activity_updated = graphene.List(graphene.Boolean, code=graphene.String())
 
     # Подписка на обновления списка участников комнаты по коду
     def resolve_room_participants_updated(self, info, code):
@@ -253,19 +223,6 @@ class Subscription(graphene.ObjectType):
                 return self.filter(lambda event: filter_room_participants_events(event, room)).map(lambda event: event.instance)
             else:
                 raise Exception('Error code')
-        except Exception as e:
-            return None
-
-    # Подписка на обновление очереди
-    def resolve_queue_updated(self, info, code):
-        try:
-            code_array = str(code).split('-')
-            if len(code_array) > 1:
-                organization = Organization.objects.get(
-                    prefix__iexact=code_array[0])
-                room = Room.objects.get(
-                    key=code_array[1], organization=organization)
-                return self.filter(lambda event: filter_queue_updated_events(event, room)).map(lambda event: event.instance)
         except Exception as e:
             return None
 

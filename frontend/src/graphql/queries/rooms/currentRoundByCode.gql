@@ -2,6 +2,7 @@ query ($code: String!) {
   currentRoundByCode(code: $code) {
     id
     currentMonthId
+    currentMonthKey
     key
     isActive
     isFinished

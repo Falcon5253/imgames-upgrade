@@ -133,13 +133,10 @@
 import roomByCode from '@/graphql/queries/rooms/roomByCode.gql';
 import currentRoundByCode from '@/graphql/queries/rooms/currentRoundByCode.gql';
 import roomUpdated from '@/graphql/subscriptions/rooms/roomUpdated.gql';
-import currentRoundUpdated from '@/graphql/subscriptions/rooms/currentRoundUpdated.gql';
+// import currentRoundUpdated from '@/graphql/subscriptions/rooms/currentRoundUpdated.gql';
 import connectRoom from '@/graphql/mutations/rooms/connectRoom.gql';
 import roomParticipants from '@/graphql/queries/rooms/roomParticipants.gql';
 import roomParticipantsUpdated from '@/graphql/subscriptions/rooms/roomParticipantsUpdated.gql';
-import getQueueOfRoom from '@/graphql/queries/rooms/getQueueOfRoom.gql';
-import queueUpdated from '@/graphql/subscriptions/rooms/queueUpdated.gql';
-import monthById from '@/graphql/queries/rooms/monthById.gql';
 import PlayersList from '@/components/room/playground/PlayersList.vue';
 import EffectsList from '@/components/room/playground/EffectsList.vue';
 import GameBoard from '@/components/room/playground/gameBoard/GameBoard.vue';
@@ -173,6 +170,8 @@ export default {
       isCardsListOpened: true,
       windowWidth: window.innerWidth,
       highlight: false,
+      keepOnLinstening: true,
+      intervalId: undefined,
     };
   },
   computed: {
@@ -195,14 +194,14 @@ export default {
       return 0;
     },
     currentMonthKey() {
-      if (this.monthById != undefined) {
-        return this.monthById.key;
+      if (this.currentRoundByCode != undefined) {
+        return this.currentRoundByCode.currentMonthKey
       }
       return 0;
     },
     currentMonthId() {
-      if (this.currentRoundByCode != undefined) {
-        return this.currentRoundByCode.currentMonthId;
+      if (this.currentMonthByCode != undefined) {
+        return this.currentMonthByCode.id;
       }
       return 0;
     },
@@ -224,11 +223,6 @@ export default {
         }
       }
       return [];
-    },
-    queue() {
-      if (this.getQueueOfRoom != undefined) {
-        return this.getQueueOfRoom;
-      }
     },
     roomIsActive() {
       if (this.currentRoundByCode != undefined) {
@@ -311,30 +305,6 @@ export default {
           code: this.roomCode,
         };
       },
-      subscribeToMore: {
-        document: currentRoundUpdated,
-        variables() {
-          return {
-            code: this.roomCode,
-          };
-        },
-        skip() {
-          return this.skip;
-        },
-        updateQuery: (previousResult, { subscriptionData }) => {
-          return {
-            currentRoundByCode: subscriptionData.data.currentRoundUpdated,
-          };
-        },
-      },
-    },
-    monthById: {
-      query: monthById,
-      variables() {
-        return {
-          id: this.currentMonthId,
-        };
-      },
     },
     roomParticipants: {
       query: roomParticipants,
@@ -368,35 +338,12 @@ export default {
         },
       },
     },
-    getQueueOfRoom: {
-      query: getQueueOfRoom,
-      variables() {
-        return {
-          code: this.roomCode,
-        };
-      },
-      subscribeToMore: {
-        document: queueUpdated,
-        variables() {
-          return {
-            code: this.roomCode,
-          };
-        },
-        skip() {
-          return this.skip;
-        },
-        updateQuery: (previousResult, { subscriptionData }) => {
-          return previousResult;
-        },
-      },
-    },
   },
   methods: {
     async reloadRound() {
-      console.log("RELOADING")
       this.skip = true;
-      await this.$apollo.queries.roomByCode.refresh();
       await this.$apollo.queries.currentRoundByCode.refresh();
+      await this.$apollo.queries.roomParticipants.refresh();
       this.skip = false;
     },
     async startHighlightAnim() {
@@ -434,6 +381,7 @@ export default {
       this.isCardsListOpened = !this.isCardsListOpened;
     },
     awaitIsOver() {
+      this.$apollo.queries.roomParticipants.refresh();
       this.$root.$emit("awaitIsOver");
     },
   },
@@ -455,7 +403,7 @@ export default {
     this.$root.$on('refreshRound', () => {
       this.$apollo.queries.currentRoundByCode.refresh();
     });
-    window.addEventListener('onfocus', alert("Hi"));
+    setInterval(this.reloadRound, 5000);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);
@@ -468,7 +416,7 @@ export default {
       },
       immediate: true
     },
-    getQueueOfRoom: {
+    players: {
       async handler() {
         await this.$apollo.queries.currentRoundByCode.refresh();
       },

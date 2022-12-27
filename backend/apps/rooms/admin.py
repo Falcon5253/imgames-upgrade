@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant, Message, Queue
+from apps.rooms.models import Winner, Turn, Month, Round, Room, RoomParticipant, Message
 
 
 @admin.register(Winner)
@@ -10,11 +10,6 @@ class WinnerAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ( 'room', 'user', 'text', 'created_at')
-    # list_display_links = ('place', 'user')
-
-@admin.register(Queue)
-class QueueAdmin(admin.ModelAdmin):
-    list_display = ( 'id', 'room', 'participant', 'made_turn')
     # list_display_links = ('place', 'user')
 
 @admin.register(Turn)
@@ -30,7 +25,7 @@ class MonthAdmin(admin.ModelAdmin):
 
 @admin.register(Round)
 class RoundAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'room', 'current_month',
+    list_display = ('__str__', 'room', 'current_month', 'is_finished',
                     'is_active', 'created_at')
     readonly_fields = ('key', 'created_at', 'updated_at')
     search_fields = ('room__organization__prefix',)
@@ -61,5 +56,5 @@ class RoomAdmin(admin.ModelAdmin):
 
 @admin.register(RoomParticipant)
 class RoomParticipantAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'room')
+    list_display = ('id', 'user', 'room', 'is_turn_made')
     list_display_links = ('id', 'user')

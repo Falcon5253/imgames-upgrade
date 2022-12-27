@@ -81,9 +81,6 @@ export default {
     },
   },
   methods: {
-    waitingForOthersIsOver() {
-      this.waitingForOthers = false;
-    },
     addChoice(cardId) {
       if (!this.isSelected(cardId)) {
         this.selectedCardsId.push(+cardId);
@@ -124,7 +121,7 @@ export default {
   },
   mounted() {
     this.$root.$on('awaitIsOver', () => {
-      this.waitingForOthersIsOver();
+      this.waitingForOthers = false;
       this.$apollo.queries.canDoStepNowByCode.refresh();
     })
   }

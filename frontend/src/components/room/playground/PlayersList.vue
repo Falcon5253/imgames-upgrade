@@ -47,7 +47,8 @@ export default {
     collapse() {
       this.$emit('closeMenu');
     }
-  }
+  },
+
 };
 </script>
 

@@ -1,6 +1,7 @@
 subscription ($code: String!) {
   roomParticipantsUpdated(code: $code) {
     id
+    isTurnMade
     user {
       id
       lastName

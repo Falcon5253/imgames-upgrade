@@ -44,7 +44,8 @@ class Round(models.Model):
     current_month = models.ForeignKey(
         "Month", related_name="current_month", verbose_name="Текущий месяц", on_delete=models.CASCADE, null=True, blank=True)
     key = models.PositiveIntegerField("Порядковый номер раунда в комнате")
-    is_active = models.BooleanField("Начался ли", default=False)
+    is_active = models.BooleanField("В процессе ли", default=False)
+    is_finished = models.BooleanField("Закончился ли", default=False)
     created_at = models.DateTimeField("Создан в", auto_now_add=True)
     updated_at = models.DateTimeField("Обновлён в", auto_now=True)
 
@@ -174,6 +175,7 @@ class RoomParticipant(models.Model):
         Room, verbose_name="Комната", on_delete=models.CASCADE)
     user = models.ForeignKey(
         User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    is_turn_made = models.BooleanField(verbose_name="Ход сделан", default=False)
 
     class Meta:
         verbose_name = "Участник комнаты"
@@ -181,17 +183,6 @@ class RoomParticipant(models.Model):
 
     def __str__(self):
         return f"Участник #{str(self.id)}"
-
-
-class Queue(models.Model):
-    """Очередь комнаты"""
-    room = models.ForeignKey(
-        Room, verbose_name="Комната", on_delete=models.CASCADE)
-    participant = models.ForeignKey(RoomParticipant, verbose_name="Участник", on_delete=models.CASCADE)
-    made_turn = models.BooleanField(verbose_name="Ход сделан", default=False)
-    class Meta:
-        verbose_name = "Участник в очереди"
-        verbose_name_plural = "Участники в очереди"
 
 
 class Message(models.Model):

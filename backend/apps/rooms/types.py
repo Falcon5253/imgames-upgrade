@@ -1,5 +1,5 @@
 import graphene
-from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant, Message, Queue
+from apps.rooms.models import CardChoice, Winner, Turn, Month, Round, Room, RoomParticipant, Message
 from apps.organizations.models import Organization
 from graphene_django.types import DjangoObjectType
 
@@ -39,21 +39,18 @@ class MonthType(DjangoObjectType):
 
 
 class RoundType(DjangoObjectType):
-    is_finished = graphene.Boolean()
     current_month_id = graphene.Int()
-
-    def resolve_is_finished(self, info):
-        if self.current_month is not None and self.room is not None:
-            return self.room.number_of_turns == self.current_month.key
-        else:
-            return False
+    current_month_key = graphene.Int()
 
     def resolve_current_month_id(self, info):
         return self.current_month.id
 
+    def resolve_current_month_key(self, info):
+        return self.current_month.key
+
     class Meta:
         model = Round
-        fields = ["id", "key", "is_active"]
+        fields = ["id", "key", "is_active", "is_finished", "is_old"]
 
 
 class RoomType(DjangoObjectType):
@@ -61,6 +58,7 @@ class RoomType(DjangoObjectType):
     current_round_id = graphene.Int()
     room_owner_id = graphene.Int()
     flow_id = graphene.Int()
+    current_month_key = graphene.Int()
 
     def resolve_code(self, info):
         organization = self.organization
@@ -68,6 +66,11 @@ class RoomType(DjangoObjectType):
 
     def resolve_current_round_id(self, info):
         return self.current_round.id
+    
+    def resolve_current_month_key(self, info):
+        round = self.current_round
+        month = round.current_month
+        return month.key
     
     def resolve_room_owner_id(self, info):
         return self.room_owner.id
@@ -77,9 +80,4 @@ class RoomType(DjangoObjectType):
 
     class Meta:
         model = Room
-        fields = ["id", "key", "__typename", "number_of_turns", "money_per_month"]
-
-class QueueType(DjangoObjectType):
-    class Meta:
-        model = Queue
-        fields = "__all__"
+        fields = ["id", "key", "number_of_turns", "money_per_month"]

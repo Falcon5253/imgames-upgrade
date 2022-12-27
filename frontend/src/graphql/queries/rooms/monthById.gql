@@ -1,7 +1,0 @@
-query ($id: Int!) {
-  monthById(id: $id) {
-    id
-    key
-    __typename
-  }
-}

@@ -15,7 +15,6 @@ export default {
   },
   methods: {
     awaitIsOver() {
-      console.log(2);
       this.$emit("awaitIsOver");
     },
   }

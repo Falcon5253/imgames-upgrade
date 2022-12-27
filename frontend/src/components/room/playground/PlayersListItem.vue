@@ -1,5 +1,5 @@
 <template>
-  <div class="players-list-item normal-border-box">
+  <div class="players-list-item normal-border-box" :class="{ userMadeTurn: player.isTurnMade }">
     <div v-if="ownerId == player.user.id" class="room-owner-icon">
       <img src="@/assets/icons/inner-star.svg" />
     </div>
@@ -51,5 +51,8 @@ export default {
   .player-avatar {
     height: 38px;
   }
+}
+.userMadeTurn {
+  background: linear-gradient(135deg, #4fcd33 0%, #2d9c8c 100%);
 }
 </style>
