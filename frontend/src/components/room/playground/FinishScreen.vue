@@ -239,6 +239,7 @@ export default {
         if (b == null || a < b) return -1;
         return 0;
       });
+      this.$apollo.queries.winnersFromCurrentRound.refresh();
     },
   },
 };

@@ -5,7 +5,7 @@ from .types import ComputedGameDataType
 from .models import ChannelComputed, StageComputed
 from apps.organizations.models import Organization
 from apps.rooms.models import Room, Turn, Month
-from apps.flows.models import Channel, Stage
+from apps.flows.models import Channel, Stage, StageOfChannel
 from apps.users.models import User
 from graphene_subscriptions.events import CREATED, UPDATED, DELETED
 from math import ceil
@@ -43,17 +43,22 @@ def prepare_computed_game_data_array(room, user, current_month=None):
             channel_next = channel_start_value
             for i, stage in enumerate(stages, start=0):
 
-                # Высчитываем значение после конверсии
-                channel_next = ceil(channel_next * stage.conversion) # Уточнить на конверсию какого канала умножается / может ли она применяться ко многим каналам?
+                try: # Если есть определенная конверсия у данного канала, то используем ее
+                    certain_stage = StageOfChannel.objects.get(channels=channel, stage=stage)
+                    stage_conversion = certain_stage.conversion
+                except: # Если нет, то используем стандартную конверсию канала
+                    stage_conversion = stage.conversion
 
-                # А МЕНЯЕТСЯ ТО ТОЛЬКО НАЧАЛЬНОЕ ЗНАЧЕНИЕ ОКАЗЫВАЕТСЯ
+                # Высчитываем значение после конверсии
+                channel_next = ceil(channel_next * stage_conversion)
+
                 total_data[1+(2*i)] = '{0:.2f}'.format(
                     Decimal(total_data[1+(2*i)])+Decimal(0))
                 total_data[2+(2*i)] = '{0:.2f}'.format(
                     Decimal(channel_next)+Decimal(total_data[2+(2*i)]))
 
                 # Форматируем данные для ответа
-                data += ['{0:.2f}'.format(stage.conversion),
+                data += ['{0:.2f}'.format(stage_conversion),
                          '{0:.2f}'.format(channel_next)]
 
             # Добавляем данные в массив возвращаемых значений
@@ -102,8 +107,15 @@ def prepare_computed_game_data_array(room, user, current_month=None):
             channel_next = channel_start_value
             for i, stage in enumerate(computed_stages, start=0):
 
+                try: # Если есть определенная конверсия у данного канала, то используем ее
+                    certain_stage = StageOfChannel.objects.get(channels=computed_channel.channel, stage=stage.stage)
+                    stage_conversion = certain_stage.conversion
+
+                except: # Если нет, то используем стандартную конверсию канала
+                    stage_conversion = stage.conversion
+
                 # Высчитываем значение после конверсии
-                channel_next = ceil(channel_next * stage.conversion)
+                channel_next = ceil(channel_next * stage_conversion)
 
                 #
                 total_data[1+(2*i)] = '{0:.2f}'.format(
@@ -112,7 +124,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
                     Decimal(channel_next)+Decimal(total_data[2+(2*i)]))
 
                 # Форматируем данные для ответа
-                data += ['{0:.2f}'.format(stage.conversion),
+                data += ['{0:.2f}'.format(stage_conversion),
                          '{0:.2f}'.format(channel_next)]
 
             # Добавляем данные в массив возвращаемых значений

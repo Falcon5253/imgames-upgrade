@@ -105,7 +105,6 @@ def change_month_in_room(room_id):
                 all_users_turns = all_users_turns + [turn for turn in turns]
             except Turn.DoesNotExist:
                 pass
-        print(all_users_turns)
 
         # Пересчитываем, сколько раз подряд использовались карточки
         turns_in_row = {} # Хранит финальное количество, сколько раз подряд использовалась карточка
@@ -139,7 +138,6 @@ def change_month_in_room(room_id):
         # 2. Для каждого изменения из-за карточек обновляем данные
         # Для каждого шага за последний месяц
         for turn in prev_month_users_turns:
-            print(turn.user)
             # Получаем набор выборов карточек за ход игрока
             user_card_choices = CardChoice.objects.filter(turn=turn)
             # Для каждого выбора карточек
