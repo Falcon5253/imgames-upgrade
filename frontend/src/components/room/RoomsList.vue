@@ -32,6 +32,9 @@ export default {
       return this.$store.state.subdomain;
     },
   },
+  mounted() {
+    clearInterval(window.myInterval);
+  }
 };
 </script>
 

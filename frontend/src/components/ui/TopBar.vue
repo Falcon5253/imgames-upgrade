@@ -36,7 +36,7 @@
         <SubmitButton
           class="menu-link"
           :type="'light-text'"
-          @click="$router.push(authPath)"
+          @click="$router.push(authPath);"
           >{{ $t('auth.enterButton') }}</SubmitButton
         >
       </div>
@@ -88,6 +88,11 @@ export default {
       authPath: AUTH_PATH,
     };
   },
+  method: {
+    stopInterval() {
+      console.log(1)
+    }
+  }
 };
 </script>
 

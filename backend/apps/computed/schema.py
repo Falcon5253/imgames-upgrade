@@ -2,7 +2,7 @@ from decimal import Decimal
 import graphene
 from graphene_django.debug import DjangoDebug
 from .types import ComputedGameDataType
-from .models import ChannelComputed, StageComputed
+from .models import ChannelComputed, StageComputed, StageOfChannelComputed
 from apps.organizations.models import Organization
 from apps.rooms.models import Room, Turn, Month
 from apps.flows.models import Channel, Stage, StageOfChannel
@@ -109,7 +109,9 @@ def prepare_computed_game_data_array(room, user, current_month=None):
 
                 try: # Если есть определенная конверсия у данного канала, то используем ее
                     certain_stage = StageOfChannel.objects.get(channels=computed_channel.channel, stage=stage.stage)
-                    stage_conversion = certain_stage.conversion
+                    certain_computed_stages = StageOfChannelComputed.objects.get(turn=user_turn, stage_of_channel=certain_stage)
+                    stage_conversion = certain_computed_stages.conversion
+
 
                 except: # Если нет, то используем стандартную конверсию канала
                     stage_conversion = stage.conversion

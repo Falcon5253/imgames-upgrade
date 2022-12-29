@@ -172,7 +172,6 @@ export default {
       windowWidth: window.innerWidth,
       highlight: false,
       keepOnLinstening: true,
-      intervalId: undefined,
     };
   },
   computed: {
@@ -404,7 +403,7 @@ export default {
     this.$root.$on('refreshRound', () => {
       this.$apollo.queries.currentRoundByCode.refresh();
     });
-    setInterval(this.reloadRound, 5000);
+    window.myInterval = setInterval(this.reloadRound, 5000);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);

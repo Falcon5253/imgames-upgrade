@@ -241,7 +241,18 @@ export default {
       });
       this.$apollo.queries.winnersFromCurrentRound.refresh();
     },
-  },
+    allComputedMonthsByCodeTotal() {
+      this.$store.commit('CLEAN_CHOSEN_CARD');
+      this.monthKeys = [
+        ...new Set(this.allComputedMonthsByCode.map((el) => el.monthKey)),
+      ].sort((a, b) => {
+        if (a > b) return 1;
+        if (b == null || a < b) return -1;
+        return 0;
+      });
+      this.$apollo.queries.winnersFromCurrentRound.refresh();
+    },
+  }
 };
 </script>
 

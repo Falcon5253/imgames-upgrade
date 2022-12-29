@@ -110,15 +110,11 @@ class WriteTurn(graphene.Mutation):
 
                 # Проверяем все ли другие сделали ход
                 # количество участников сделавших ход должно быть на 1 меньше, чем участников всего
-                print(turn_made_participants.count())
-                print(all_participants.count())
                 if turn_made_participants.count() >= (all_participants.count()-1):
-                    print(1.1)
                     # Обнуляем их шаги, если был не последний месяц
                     key = current_month.key
                     if not (Month.objects.filter(key=key+2, round=current_round).count() == 0):
                         turn_made_participants.update(is_turn_made=False)
-                        print(1)
 
                     # Завершаем раунд, если был последний месяц
                     else:
@@ -131,7 +127,6 @@ class WriteTurn(graphene.Mutation):
                     
                     # Меняем месяц
                     task = change_month_in_room.delay(room.id)
-                    print(2)
 
                 # Если не все, то записываем, что текущий участник сделал ход
                 else:

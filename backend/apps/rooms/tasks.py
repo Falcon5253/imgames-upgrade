@@ -3,8 +3,8 @@ from hashlib import new
 from celery import shared_task
 from apps.organizations.models import Organization, OrganizationSettings
 from apps.rooms.models import Room, Month, Turn, CardChoice, Winner
-from apps.flows.models import Stage, Channel, ParameterChange
-from apps.computed.models import ChannelComputed, StageComputed
+from apps.flows.models import Stage, Channel, ParameterChange, StageOfChannel
+from apps.computed.models import ChannelComputed, StageComputed, StageOfChannelComputed
 from apps.users.models import User
 from apps.computed.schema import prepare_computed_game_data_array
 from graphene_subscriptions.events import SubscriptionEvent
@@ -52,6 +52,11 @@ def change_month_in_room(room_id):
             # TODO: Получаем этапы по умолчанию
             stages = Stage.objects.filter(flow=room.flow)
 
+            # TODO: Получаем этапы для определенных каналов
+            stages_of_channel = []
+            for channel in channels:
+                stages_of_channel += StageOfChannel.objects.filter(channels=channel)
+
             # Для каждого шага-пользователя за месяц
             for turn in prev_month_users_turns:
                 # Для каждого этапа записываем вычисляемое значение c конверсией по умолчанию
@@ -63,6 +68,12 @@ def change_month_in_room(room_id):
                 for channel in channels:
                     ChannelComputed.objects.create(
                         turn=turn, channel=channel, cardinal_value=channel.default_value)
+
+
+                for stage_of_channel in stages_of_channel:
+                    StageOfChannelComputed.objects.create(
+                        turn=turn, stage_of_channel=stage_of_channel, conversion=stage_of_channel.conversion
+                    )
 
         # Если месяц был не начальным
         else:
@@ -95,6 +106,13 @@ def change_month_in_room(room_id):
                     ChannelComputed.objects.create(
                         turn=turn, channel=old_computed_channel.channel, cardinal_value=old_computed_channel.cardinal_value)
 
+                # Для каждого этапа конкретного канала
+                prev_computed_stages_of_channel = StageOfChannelComputed.objects.filter(turn=prev_turn)
+                for prev_computed_stage_of_channel in prev_computed_stages_of_channel:
+                    # Дублируем запись в вычисляемых значениях со ссылкой на новый ход
+                    StageOfChannelComputed.objects.create(
+                        turn=turn, stage_of_channel=prev_computed_stage_of_channel.stage_of_channel, conversion=prev_computed_stage_of_channel.conversion
+                    )
             
         # Находим ходы за предыдущие месяца для проверки месяца применения карточек
         all_users_turns = []
@@ -126,18 +144,20 @@ def change_month_in_room(room_id):
             # Получаем все выборы карт в ходе пользователя
 
             current_turn_in_row.update({turn.user.id : {}})
+
             for card_choice in user_card_choices:
                 current_turn_in_row[turn.user.id].update({ card_choice.card.id: 1 })
                 turns_in_row = current_turn_in_row
-                if turn.user.id in previous_month_turns:
-                    if card_choice.card.id in previous_month_turns[turn.user.id]:
-                        current_turn_in_row[turn.user.id][card_choice.card.id] += previous_month_turns[turn.user.id][card_choice.card.id]
-                        turns_in_row = current_turn_in_row
+                
+                if turn.user.id in previous_month_turns and card_choice.card.id in previous_month_turns[turn.user.id]:
+                    current_turn_in_row[turn.user.id][card_choice.card.id] += previous_month_turns[turn.user.id][card_choice.card.id]
+                    turns_in_row = current_turn_in_row
 
 
         # 2. Для каждого изменения из-за карточек обновляем данные
         # Для каждого шага за последний месяц
         for turn in prev_month_users_turns:
+
             # Получаем набор выборов карточек за ход игрока
             user_card_choices = CardChoice.objects.filter(turn=turn)
             # Для каждого выбора карточек
