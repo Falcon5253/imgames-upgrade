@@ -131,6 +131,7 @@ class WriteTurn(graphene.Mutation):
                     
                     # Меняем месяц
                     task = change_month_in_room.delay(room.id)
+                    print(2)
 
                 # Если не все, то записываем, что текущий участник сделал ход
                 else:

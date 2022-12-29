@@ -35,6 +35,7 @@
           ></GameBoard>
           <transition name="slide-fade" mode="out-in">
             <CardsList
+              @clean="reloadRound()"
               v-if="isCardsListOpened"
               :class="{
                 'first-column-bottom': isCardsListOpened,

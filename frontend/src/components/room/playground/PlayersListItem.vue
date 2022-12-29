@@ -4,8 +4,13 @@
       <img src="@/assets/icons/inner-star.svg" />
     </div>
     <img class="player-avatar" src="@/assets/no_avatar.svg" alt="Аватар" />
-    {{ player.user.firstName }}
-    {{ player.user.lastName }}
+    <div v-if="userId == player.user.id">
+      {{ $t('room.player.you') }}
+    </div>
+    <div v-else>
+      {{ player.user.firstName }}
+      {{ player.user.lastName }}
+    </div>
   </div>
 </template>
 
@@ -22,6 +27,11 @@ export default {
       required: true,
     },
   },
+  computed: {
+    userId() {
+      return this.$store.state.userId;
+    },
+  }
 };
 </script>
 

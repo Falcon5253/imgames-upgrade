@@ -11,7 +11,7 @@
       class="write-turn-panel"
       :disabled="balance < 0 || (!canDoStepNowByCode || waitingForOthers)"
       :selectedCardsId="selectedCardsId"
-      @clean="selectedCardsId = []"
+      @clean="selectedCardsId = []; $emit('clean')"
       @cardsAreSend="waitingForOthers = true"
     ></WriteTurnPanel>
     <div class="cards-list scrollable">
