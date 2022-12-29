@@ -37,7 +37,7 @@
           <div class="message normal-border-box">
             <small>{{
               message.user
-                ? (message.user.firstName + message.user.lastName)
+                ? (message.user.firstName + " " + message.user.lastName)
                 : $t('room.player.player') + ' #' + message.user.id
             }}</small>
             {{ message.text }}

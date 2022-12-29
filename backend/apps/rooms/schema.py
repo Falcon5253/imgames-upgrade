@@ -64,8 +64,14 @@ class Query(graphene.ObjectType):
 
     def resolve_rooms_in_organization(self, info, subdomain):
         try:
+            user = info.context.user
             organization = Organization.objects.get(subdomain=subdomain)
-            return Room.objects.filter(organization=organization).order_by('-key')
+            participants = RoomParticipant.objects.filter(user=user).order_by('-room__key')
+            rooms = []
+            for participant in participants:
+                if participant.room.organization == organization:
+                    rooms += [participant.room]
+            return rooms
         except Exception as e:
             return None
 

@@ -50,7 +50,7 @@ class RoundType(DjangoObjectType):
 
     class Meta:
         model = Round
-        fields = ["id", "key", "is_active", "is_finished", "is_old"]
+        fields = ["id", "key", "is_active", "is_finished"]
 
 
 class RoomType(DjangoObjectType):

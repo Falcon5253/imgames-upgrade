@@ -246,7 +246,6 @@ class ReStartRound(graphene.Mutation):
                     participants.update(is_turn_made=False)
 
                     old_round = room.current_round
-                    old_round.is_old = True
                     old_round.save()
 
                     room.current_round = new_round
