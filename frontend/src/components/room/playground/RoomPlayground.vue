@@ -344,6 +344,7 @@ export default {
       this.skip = true;
       await this.$apollo.queries.currentRoundByCode.refresh();
       await this.$apollo.queries.roomParticipants.refresh();
+      this.$root.$emit("update");
       this.skip = false;
     },
     async startHighlightAnim() {

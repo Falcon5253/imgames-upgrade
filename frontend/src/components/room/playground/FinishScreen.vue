@@ -252,6 +252,13 @@ export default {
       });
       this.$apollo.queries.winnersFromCurrentRound.refresh();
     },
+  },
+  mounted() {
+    this.$root.$on('update', () => {
+      this.$apollo.queries.allComputedMonthsByCode.refresh();
+      this.$apollo.queries.allComputedMonthsByCodeTotal.refresh();
+      this.$apollo.queries.winnersFromCurrentRound.refresh();
+    });
   }
 };
 </script>
