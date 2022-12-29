@@ -185,13 +185,24 @@ def change_month_in_room(room_id):
                     # Если происходит изменение конверсии этапа:
                     if parameter_change.type == "CONV":
                         # Находим вычисляемое значение StageComputed
-                        computed_stage = StageComputed.objects.get(
-                            stage=parameter_change.stage, turn=turn)
+                        try:
 
-                        # Изменяем значение конверсии этапа
-                        computed_stage.conversion = round(compute_value(
-                            old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
-                        computed_stage.save()
+                            certain_stage = StageOfChannel.objects.get(channels=parameter_change.channel, stage=parameter_change.stage)
+                            certain_stage_computed = StageOfChannelComputed.objects.get(turn=turn, stage_of_channel=certain_stage)
+                            certain_stage_computed.conversion = round(compute_value(
+                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
+                            certain_stage_computed.save()
+                            print(certain_stage_computed.conversion)
+                        except Exception as e:
+                            print("hi")
+                            print(e)
+                            computed_stage = StageComputed.objects.get(
+                                stage=parameter_change.stage, turn=turn)
+
+                            # Изменяем значение конверсии этапа
+                            computed_stage.conversion = round(compute_value(
+                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
+                            computed_stage.save()
 
 
         # Высчитываем следующий номер месяца

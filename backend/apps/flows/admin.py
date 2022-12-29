@@ -60,6 +60,5 @@ class StageOfChannelAdmin(admin.ModelAdmin):
 
 @admin.register(ParameterChange)
 class ParameterChangeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'channel', 'type', 'math_operator',
+    list_display = ('channel', 'stage', 'type', 'math_operator',
                     'value', 'month_of_application', 'card')
-    list_display_links = ('id', 'channel')
