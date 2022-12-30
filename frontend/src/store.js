@@ -34,6 +34,7 @@ const store = new Vuex.Store({
     packageVersion: process.env.PACKAGE_VERSION || '0',
     chosenCards: [],
     messages: [],
+    userName: "",
   },
   mutations: {
     START_LOADING(state) {
@@ -50,6 +51,9 @@ const store = new Vuex.Store({
     },
     SET_USER_ID(state, userId) {
       state.userId = userId;
+    },
+    SET_USER_NAME(state, name) {
+      state.userName = name;
     },
     ADD_CHOSEN_CARD(state, card) {
       if (card != undefined) {

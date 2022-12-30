@@ -18,6 +18,7 @@ import {
 } from '@/pathVariables.js';
 
 import verifyToken from '@/graphql/mutations/verifyToken.gql';
+import profile from '@/graphql/queries/profile.gql';
 
 export function verifyAuth(to, from) {
   store.commit('START_LOADING');
@@ -29,6 +30,9 @@ export function verifyAuth(to, from) {
         let userId = result.data.verifyToken.payload.user_id;
         store.commit('SET_USER_ID', userId);
         store.commit('SET_IS_AUTHENTICATED', true);
+        console.log(1);
+        setProfile(provider, userId);
+        console.log(2);
       })
       .catch((error) => {
         store.commit('SET_IS_AUTHENTICATED', false);
@@ -38,6 +42,16 @@ export function verifyAuth(to, from) {
         store.commit('STOP_LOADING');
         resolve();
       });
+  });
+}
+
+async function setProfile(provider, userId) {
+  return new Promise(function (resolve, reject) {
+    provider.defaultClient
+      .mutate({ mutation: profile })
+      .then((result) => {
+        store.commit('SET_USER_NAME', result.data.profile.firstName + " " + result.data.profile.lastName);
+      })
   });
 }
 

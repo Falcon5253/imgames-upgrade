@@ -45,6 +45,7 @@
       <div class="left-block"></div>
       <div class="right-block">
         <LocaleSwitcher></LocaleSwitcher>
+        <p class='userName'> {{ this.$store.state.userName }} </p>
         <LogOutButton class="menu-link"></LogOutButton>
       </div>
     </div>
@@ -88,11 +89,6 @@ export default {
       authPath: AUTH_PATH,
     };
   },
-  method: {
-    stopInterval() {
-      console.log(1)
-    }
-  }
 };
 </script>
 
@@ -143,6 +139,25 @@ export default {
   color: $light_text_color;
   animation: blink 2s 3 linear ;
 }
+
+.userName {
+  background-color: transparent;
+  color: $light_text_color;
+  border: 0px;
+  margin-top: 6px;
+  padding-left: 30px;
+  padding-right: 20px;
+  & option {
+    color: $dark_text_color;
+  }
+}
+
+@media (max-width: 768px) {
+  .userName {
+    display: none;
+  }
+}
+
 @keyframes blink {  
 	0% { color: $light_text_color; }
 	25% { color: #FBB; }
