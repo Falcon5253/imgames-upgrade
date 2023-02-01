@@ -1,11 +1,10 @@
 import graphene
-from graphene_subscriptions.events import SubscriptionEvent
 from .models import Room, Round, Month, Turn, CardChoice, RoomParticipant, Message
 from apps.organizations.models import Organization
 from apps.flows.models import Flow, Card
 from apps.rooms.types import RoundType, RoomType, TurnType
-from django.forms.models import model_to_dict
 from apps.rooms.tasks import change_month_in_room
+from config.pusher import pusher_client
 
 
 class CreateRoom(graphene.Mutation):
@@ -149,6 +148,7 @@ class WriteTurn(graphene.Mutation):
                     
                     # Меняем месяц
                     task = change_month_in_room.delay(room.id)
+                    pusher_client.trigger(room.code, 'roundUpdate', {})
 
                 # Если не все, то записываем, что текущий участник сделал ход
                 else:
@@ -159,6 +159,9 @@ class WriteTurn(graphene.Mutation):
                     current_participant.save()
                     print(current_participant.is_turn_made)
 
+                print(1)
+                pusher_client.trigger(code, 'participantsUpdate', {})
+                print(2)
                 # Возвращаем результат
                 return WriteTurn(turn=turn, success=True)
             return WriteTurn(success=False, errors=['Error code!'])
@@ -197,8 +200,9 @@ class StartRound(graphene.Mutation):
                     current_participant_update.is_turn_made = False
                     current_participant_update.save()
                 
-
-
+                print(3)
+                pusher_client.trigger(code, 'roundUpdate', {})
+                print(4)
                 return StartRound(success=True)
         except Exception as e:
             return StartRound(success=False, errors=[str(e)])
@@ -268,6 +272,8 @@ class ReStartRound(graphene.Mutation):
 
                     room.current_round = new_round
                     room.save()
+                # pusher_client.trigger(code, 'roundUpdate', {})
+                pusher_client.trigger(code, 'roomUpdate', {})
                 return ReStartRound(success=True)
         except Exception as e:
             return ReStartRound(success=False, errors=[str(e)])
@@ -294,7 +300,7 @@ class ConnectRoom(graphene.Mutation):
 
                 participant, created = RoomParticipant.objects.get_or_create(
                     room=room, user=user)
-
+                pusher_client.trigger(code, 'participantsUpdate', {})
                 return ConnectRoom(success=True, created=created)
         except Exception as e:
             return ConnectRoom(success=False, errors=[str(e)])

@@ -10,6 +10,7 @@
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
   },
   "dependencies": {
+    "pusher-js": "^8.0.1",
     "@sentry/tracing": "^6.3.5",
     "@sentry/vue": "^6.3.5",
     "@vue/cli-shared-utils": "^5.0.1",

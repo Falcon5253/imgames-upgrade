@@ -1,6 +1,11 @@
 import Vue from 'vue';
 import store from '@/store';
 import router from '@/router';
+import Pusher from 'pusher-js';
+
+window.pusher = new Pusher('a35a778f61b46d2e76a4', {
+  cluster: 'eu'
+});
 
 import { createProvider } from '@/apollo';
 

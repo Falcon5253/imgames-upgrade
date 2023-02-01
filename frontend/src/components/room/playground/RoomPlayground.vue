@@ -133,11 +133,11 @@
 <script>
 import roomByCode from '@/graphql/queries/rooms/roomByCode.gql';
 import currentRoundByCode from '@/graphql/queries/rooms/currentRoundByCode.gql';
-import roomUpdated from '@/graphql/subscriptions/rooms/roomUpdated.gql';
+// import roomUpdated from '@/graphql/subscriptions/rooms/roomUpdated.gql';
 // import currentRoundUpdated from '@/graphql/subscriptions/rooms/currentRoundUpdated.gql';
 import connectRoom from '@/graphql/mutations/rooms/connectRoom.gql';
 import roomParticipants from '@/graphql/queries/rooms/roomParticipants.gql';
-import roomParticipantsUpdated from '@/graphql/subscriptions/rooms/roomParticipantsUpdated.gql';
+// import roomParticipantsUpdated from '@/graphql/subscriptions/rooms/roomParticipantsUpdated.gql';
 import PlayersList from '@/components/room/playground/PlayersList.vue';
 import EffectsList from '@/components/room/playground/EffectsList.vue';
 import GameBoard from '@/components/room/playground/gameBoard/GameBoard.vue';
@@ -148,7 +148,7 @@ import TopBar from '@/components/ui/TopBar.vue';
 import Chat from '@/components/room/playground/Chat.vue';
 import { MAIN_PATH } from '@/pathVariables.js';
 import getChatByRoomCode from '@/graphql/queries/rooms/getChatByRoomCode.gql';
-import chatUpdated from '@/graphql/subscriptions/rooms/chatUpdated.gql';
+// import chatUpdated from '@/graphql/subscriptions/rooms/chatUpdated.gql';
 
 export default {
   name: 'RoomPlayground',
@@ -251,20 +251,6 @@ export default {
           code: this.roomCode,
         };
       },
-      subscribeToMore: {
-        document: roomUpdated,
-        variables() {
-          return {
-            code: this.roomCode,
-          };
-        },
-        skip() {
-          return this.skip;
-        },
-        updateQuery: (previousResult, { subscriptionData }) => {
-          return { roomByCode: subscriptionData.data.roomUpdated };
-        },
-      },
     },
     getChatByRoomCode: {
       query: getChatByRoomCode,
@@ -273,30 +259,6 @@ export default {
           code: this.roomCode,
         };
       },
-      subscribeToMore: {
-        document: chatUpdated,
-        variables() {
-          return {
-            code: this.roomCode,
-            userId: this.userId,
-          };
-        },
-        skip() {
-          return this.skip;
-        },
-        updateQuery: (previousResult, { subscriptionData }) => {
-          let existIndex = previousResult.getChatByRoomCode.findIndex(
-            (el) => {
-              return el.id == subscriptionData.data.chatUpdated.id;
-            }
-          );
-          if (existIndex == -1) {
-            previousResult.getChatByRoomCode.push(
-              subscriptionData.data.chatUpdated
-            );
-          };
-        },
-      }
     },
     currentRoundByCode: {
       query: currentRoundByCode,
@@ -312,30 +274,6 @@ export default {
         return {
           code: this.roomCode,
         };
-      },
-      subscribeToMore: {
-        document: roomParticipantsUpdated,
-        variables() {
-          return {
-            code: this.roomCode,
-          };
-        },
-        skip() {
-          return this.skip;
-        },
-        updateQuery: (previousResult, { subscriptionData }) => {
-          let existIndex = previousResult.roomParticipants.findIndex(
-            (el) => el.id == subscriptionData.data.roomParticipantsUpdated.id
-          );
-          if (existIndex == -1) {
-            previousResult.roomParticipants.push(
-              subscriptionData.data.roomParticipantsUpdated
-            );
-          }
-          return {
-            roomParticipants: previousResult.roomParticipants,
-          };
-        },
       },
     },
   },
@@ -404,7 +342,25 @@ export default {
     this.$root.$on('refreshRound', () => {
       this.$apollo.queries.currentRoundByCode.refresh();
     });
-    window.myInterval = setInterval(this.reloadRound, 5000);
+
+
+    let pusher = window.pusher;
+    let channel = pusher.subscribe(this.roomCode);
+
+
+    channel.bind('participantsUpdate', () => {
+      console.log(1);
+      this.$apollo.queries.roomParticipants.refresh();
+    });
+    channel.bind('roomUpdate', () => {
+      console.log(2);
+      this.$apollo.queries.roomByCode.refresh();
+    });
+    channel.bind('roundUpdate', () => {
+      console.log(3);
+      this.$apollo.queries.currentRoundByCode.refresh();
+    });
+
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);

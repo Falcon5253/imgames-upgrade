@@ -48,7 +48,6 @@ export default {
       this.$emit('closeMenu');
     }
   },
-
 };
 </script>
 

@@ -1,7 +1,5 @@
-from collections import defaultdict
 from hashlib import new
 from celery import shared_task
-from apps.organizations.models import Organization, OrganizationSettings
 from apps.rooms.models import Room, Month, Turn, CardChoice, Winner
 from apps.flows.models import Stage, Channel, ParameterChange, StageOfChannel
 from apps.computed.models import ChannelComputed, StageComputed, StageOfChannelComputed
@@ -9,8 +7,8 @@ from apps.users.models import User
 from apps.computed.schema import prepare_computed_game_data_array
 from graphene_subscriptions.events import SubscriptionEvent
 from django.forms.models import model_to_dict
-from collections import defaultdict
 from math import ceil
+from config.pusher import pusher_client
 
 MONTH_EVENT = 'month_event'
 

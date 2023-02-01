@@ -54,3 +54,4 @@ celery
 pytest
 pytest-django
 attrs~=21.0
+pusher

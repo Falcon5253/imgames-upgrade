@@ -6,6 +6,7 @@ from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner,
 from apps.organizations.models import Organization
 from graphene_subscriptions.events import CREATED, UPDATED, DELETED
 from apps.rooms.tasks import MONTH_EVENT
+import asyncio
 
 
 class Query(graphene.ObjectType):
