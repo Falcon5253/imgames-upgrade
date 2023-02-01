@@ -77,6 +77,7 @@ media/
 
 # Venv
 venv
+.venv
 
 # environment
 .env

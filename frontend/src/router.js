@@ -30,9 +30,7 @@ export function verifyAuth(to, from) {
         let userId = result.data.verifyToken.payload.user_id;
         store.commit('SET_USER_ID', userId);
         store.commit('SET_IS_AUTHENTICATED', true);
-        console.log(1);
         setProfile(provider, userId);
-        console.log(2);
       })
       .catch((error) => {
         store.commit('SET_IS_AUTHENTICATED', false);

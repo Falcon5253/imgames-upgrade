@@ -80,13 +80,35 @@ class WriteTurn(graphene.Mutation):
                     key=code_array[1], organization=organization)
                 current_round = room.current_round
                 current_month = current_round.current_month
+                
+                
+                # Считаем бюджет на данный месяц
+                months = Month.objects.filter(round=current_round)
+                turns = []
+                expenses = 0
+                for month in months:
+                    turns += Turn.objects.filter(user=user, month=month)
+                for turn in turns:
+                    choices = CardChoice.objects.filter(turn=turn)
+                    for choice in choices:
+                        card = choice.card
+                        expense = card.cost
+                        expenses += expense
+                months_passed = current_month.key
+                
+                if months_passed == 0:
+                    balance = room.money_per_month
+                else:
+                    balance = room.money_per_month * (months_passed + 1)
+                    balance = balance - expenses
 
                 # Если общая ценна карточек больше бюджета на месяц, возвращаем ошибку
                 cards_price = 0
                 for card_id in cards_id:
                     card = Card.objects.get(pk=card_id)
                     cards_price += card.cost
-                if cards_price > room.money_per_month:
+                    
+                if cards_price > balance:
                     raise Exception('Cards price is bigger than money given per month')
 
                 # Если шаг существует, возвращаем ошибку

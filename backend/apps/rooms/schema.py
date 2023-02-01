@@ -2,7 +2,7 @@ import graphene
 from graphene_django.debug import DjangoDebug
 from apps.rooms.mutations import CreateRoom, WriteTurn, StartRound, ReStartRound, ConnectRoom, SendMessage
 from apps.rooms.types import RoomType, RoundType, RoomParticipantType, TurnType, WinnerType, MessageType,  MonthType
-from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner, Message
+from apps.rooms.models import Month, Room, Turn, Round, RoomParticipant, Winner, Message, CardChoice
 from apps.organizations.models import Organization
 from graphene_subscriptions.events import CREATED, UPDATED, DELETED
 from apps.rooms.tasks import MONTH_EVENT
@@ -17,6 +17,8 @@ class Query(graphene.ObjectType):
         RoomType, subdomain=graphene.String(), description='Список комнат в организации')
     can_do_step_now_by_code = graphene.Boolean(
         code=graphene.String(), description='Может ли пользователь делать ход в данный момент')
+    get_money_per_month = graphene.Int(
+        code=graphene.String(), description='Бюджет на текущий месяц')
     current_round_by_code = graphene.Field(
         RoundType, code=graphene.String(), description='Информация о текущем раунде по коду комнаты')
     is_room_owner = graphene.Boolean(
@@ -61,6 +63,49 @@ class Query(graphene.ObjectType):
                 raise Exception('Error code')
         except Exception as e:
             return None
+        
+    def resolve_get_money_per_month(self, info, code):
+        try:
+            code_array = str(code).split('-')
+            if len(code_array) > 1:
+                user = info.context.user
+                organization = Organization.objects.get(
+                    prefix__iexact=code_array[0])
+                room = Room.objects.get(
+                    key=code_array[1], organization=organization)
+                current_round = room.current_round
+                current_month = current_round.current_month
+                months = Month.objects.filter(round=current_round)
+                turns = []
+                expenses = 0
+                for month in months:
+                    turns += Turn.objects.filter(user=user, month=month)
+                for turn in turns:
+                    choices = CardChoice.objects.filter(turn=turn)
+                    for choice in choices:
+                        card = choice.card
+                        expense = card.cost
+                        print(expense)
+                        expenses += expense
+                months_passed = current_month.key
+                
+                if months_passed == 0:
+                    balance = room.money_per_month
+                    return balance
+                
+                balance = room.money_per_month * (months_passed + 1)
+                print('balance')
+                print(balance)
+                print('sum')
+                print(expenses)
+                balance = balance - expenses
+                return balance
+            else:
+                raise Exception('Error code')
+        except Exception as e:
+            print(e)
+            return None
+        
 
     def resolve_rooms_in_organization(self, info, subdomain):
         try:

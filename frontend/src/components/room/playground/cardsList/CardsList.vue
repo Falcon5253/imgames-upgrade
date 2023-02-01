@@ -5,7 +5,7 @@
     </div>
     <div class="cards-context">
       <h3 class="cards-title">{{ $t('room.card.cardsList') }}</h3>
-      <p class="current-budget">{{ $t('room.card.moneyLeft') }}: {{ balance }} / {{ getMoneyPerMonth() }}</p>
+      <p class="current-budget">{{ $t('room.card.moneyLeft') }}: {{ balance }} / {{ moneyPerMonth }}</p>
     </div>
     <WriteTurnPanel
       class="write-turn-panel"
@@ -32,6 +32,7 @@
 import cardsByCode from '@/graphql/queries/gameBoard/cardsByCode.gql';
 import canDoStepNowByCode from '@/graphql/queries/gameBoard/canDoStepNowByCode.gql';
 import roomByCode from '@/graphql/queries/rooms/roomByCode.gql';
+import getMoneyPerMonth from '@/graphql/queries/gameBoard/getMoneyPerMonth.gql';
 import Card from '@/components/room/playground/cardsList/Card.vue';
 import WriteTurnPanel from '@/components/room/playground/cardsList/WriteTurnPanel.vue';
 
@@ -66,6 +67,14 @@ export default {
         };
       },
     },
+    getMoneyPerMonth: {
+      query: getMoneyPerMonth,
+      variables() {
+        return {
+          code: this.roomCode,
+        };
+      },
+    },
   },
   data() {
     return {
@@ -78,6 +87,12 @@ export default {
   computed: {
     roomCode() {
       return this.$route.params.roomCode;
+    },
+    moneyPerMonth() {
+      if (this.getMoneyPerMonth != undefined) {
+        return this.getMoneyPerMonth;
+      }
+      return 0;
     },
   },
   methods: {
@@ -109,10 +124,7 @@ export default {
           };
         });
       });
-      this.balance = this.getMoneyPerMonth() - expenses;
-    },
-    getMoneyPerMonth() {
-      return this.roomByCode.moneyPerMonth;
+      this.balance = this.moneyPerMonth - expenses;
     },
   },
   updated() {
@@ -123,6 +135,7 @@ export default {
     this.$root.$on('awaitIsOver', () => {
       this.waitingForOthers = false;
       this.$apollo.queries.canDoStepNowByCode.refresh();
+      this.$apollo.queries.getMoneyPerMonth.refresh();
     })
   }
 };
