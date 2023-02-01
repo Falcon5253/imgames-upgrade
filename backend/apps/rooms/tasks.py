@@ -17,13 +17,13 @@ MONTH_EVENT = 'month_event'
 
 def compute_value(old_value, math_operator, change_value):
     if math_operator == '+':
-        return old_value+change_value
+        return round(old_value+change_value, 2)
     if math_operator == '-':
-        return old_value-change_value
+        return round(old_value-change_value, 2)
     if math_operator == '*':
-        return old_value*change_value
+        return round(old_value*change_value, 2)
     if math_operator == '/':
-        return old_value/change_value
+        return round(old_value/change_value, 2) 
 
 
 @shared_task
@@ -186,13 +186,12 @@ def change_month_in_room(room_id):
                     if parameter_change.type == "CONV":
                         # Находим вычисляемое значение StageComputed
                         try:
-
+                            
                             certain_stage = StageOfChannel.objects.get(channels=parameter_change.channel, stage=parameter_change.stage)
                             certain_stage_computed = StageOfChannelComputed.objects.get(turn=turn, stage_of_channel=certain_stage)
                             certain_stage_computed.conversion = round(compute_value(
-                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
+                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 2)
                             certain_stage_computed.save()
-                            print(certain_stage_computed.conversion)
                         except Exception as e:
                             print("hi")
                             print(e)
@@ -201,7 +200,7 @@ def change_month_in_room(room_id):
 
                             # Изменяем значение конверсии этапа
                             computed_stage.conversion = round(compute_value(
-                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 1)
+                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 2)
                             computed_stage.save()
 
 
