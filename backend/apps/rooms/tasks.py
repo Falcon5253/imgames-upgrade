@@ -1,12 +1,9 @@
-from hashlib import new
 from celery import shared_task
 from apps.rooms.models import Room, Month, Turn, CardChoice, Winner
 from apps.flows.models import Stage, Channel, ParameterChange, StageOfChannel
 from apps.computed.models import ChannelComputed, StageComputed, StageOfChannelComputed
 from apps.users.models import User
 from apps.computed.schema import prepare_computed_game_data_array
-from graphene_subscriptions.events import SubscriptionEvent
-from django.forms.models import model_to_dict
 from math import ceil
 from config.pusher import pusher_client
 
@@ -286,11 +283,7 @@ def change_month_in_room(room_id):
         # Отправляем всем событие на обновление состояния комнаты
         # TODO: проверить, что корректно обновляется раунд
         room.current_round = current_round
-        month_event = SubscriptionEvent(
-            operation=MONTH_EVENT,
-            instance=model_to_dict(room))
         print("--> EVENT")
-        month_event.send()
 
         # TODO: send update on
         return new_month[0].key

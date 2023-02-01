@@ -349,18 +349,17 @@ export default {
 
 
     channel.bind('participantsUpdate', () => {
-      console.log(1);
       this.$apollo.queries.roomParticipants.refresh();
     });
     channel.bind('roomUpdate', () => {
-      console.log(2);
       this.$apollo.queries.roomByCode.refresh();
     });
     channel.bind('roundUpdate', () => {
-      console.log(3);
       this.$apollo.queries.currentRoundByCode.refresh();
     });
-
+    channel.bind('chatUpdate', () => {
+      this.$apollo.queries.getChatByRoomCode.refresh();
+    });
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.onResize);

@@ -154,14 +154,10 @@ class WriteTurn(graphene.Mutation):
                 else:
 
                     current_participant = all_participants.get(user=user)
-                    print(current_participant.is_turn_made)
                     current_participant.is_turn_made = True
                     current_participant.save()
-                    print(current_participant.is_turn_made)
 
-                print(1)
                 pusher_client.trigger(code, 'participantsUpdate', {})
-                print(2)
                 # Возвращаем результат
                 return WriteTurn(turn=turn, success=True)
             return WriteTurn(success=False, errors=['Error code!'])
@@ -200,9 +196,7 @@ class StartRound(graphene.Mutation):
                     current_participant_update.is_turn_made = False
                     current_participant_update.save()
                 
-                print(3)
                 pusher_client.trigger(code, 'roundUpdate', {})
-                print(4)
                 return StartRound(success=True)
         except Exception as e:
             return StartRound(success=False, errors=[str(e)])
@@ -226,6 +220,7 @@ class SendMessage(graphene.Mutation):
                 room = Room.objects.get(
                     key=code_array[1], organization=organization)
                 Message.objects.create(room=room, user=user, text=text)
+                pusher_client.trigger(code, 'chatUpdate', {})
                 return SendMessage(success=True)
         except Exception as e:
             print(e)
