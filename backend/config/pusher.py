@@ -1,9 +1,15 @@
 import pusher
+from .settings import env
+
+APP_ID = env.str('PUSHER_APP_ID')
+KEY = env.str('PUSHER_KEY')
+SECRET = env.str('PUSHER_SECRET')
+CLUSTER = env.str('PUSHER_CLUSTER')
 
 pusher_client = pusher.Pusher(
-  app_id='1546862',
-  key='a35a778f61b46d2e76a4',
-  secret='7c79b9e398a1438cec5b',
-  cluster='eu',
+  app_id=APP_ID,
+  key=KEY,
+  secret=SECRET,
+  cluster=CLUSTER,
   ssl=True
 )
