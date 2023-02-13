@@ -12,13 +12,13 @@ MONTH_EVENT = 'month_event'
 
 def compute_value(old_value, math_operator, change_value):
     if math_operator == '+':
-        return round(old_value+change_value, 2)
+        return round(old_value+change_value, 4)
     if math_operator == '-':
-        return round(old_value-change_value, 2)
+        return round(old_value-change_value, 4)
     if math_operator == '*':
-        return round(old_value*change_value, 2)
+        return round(old_value*change_value, 4)
     if math_operator == '/':
-        return round(old_value/change_value, 2) 
+        return round(old_value/change_value, 4) 
 
 
 @shared_task
@@ -184,9 +184,12 @@ def change_month_in_room(room_id):
                             
                             certain_stage = StageOfChannel.objects.get(channels=parameter_change.channel, stage=parameter_change.stage)
                             certain_stage_computed = StageOfChannelComputed.objects.get(turn=turn, stage_of_channel=certain_stage)
+                            print(round(compute_value(
+                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 4))
                             certain_stage_computed.conversion = round(compute_value(
-                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 2)
+                                old_value=certain_stage_computed.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 4)
                             certain_stage_computed.save()
+                            print(certain_stage_computed.conversion)
                         except Exception as e:
                             print("hi")
                             print(e)
@@ -194,9 +197,12 @@ def change_month_in_room(room_id):
                                 stage=parameter_change.stage, turn=turn)
 
                             # Изменяем значение конверсии этапа
+                            print(round(compute_value(
+                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 4))
                             computed_stage.conversion = round(compute_value(
-                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 2)
+                                old_value=computed_stage.conversion, math_operator=parameter_change.math_operator, change_value=parameter_change.value), 4)
                             computed_stage.save()
+                            print(computed_stage.conversion)
 
 
         # Высчитываем следующий номер месяца

@@ -26,9 +26,9 @@ class StageComputed(models.Model):
     turn = models.ForeignKey(
         Turn, verbose_name="Шаг пользователя", on_delete=models.CASCADE)
     conversion = models.DecimalField(
-        "Конверсия", decimal_places=2, max_digits=5, validators=[
-            MaxValueValidator(100.00),
-            MinValueValidator(0.01)
+        "Конверсия", decimal_places=4, max_digits=5, validators=[
+            MaxValueValidator(1.0000),
+            MinValueValidator(0.0001)
         ])
     # cardinal_value = models.PositiveIntegerField("Входной трафик")
 
@@ -42,9 +42,9 @@ class StageComputed(models.Model):
 class StageOfChannelComputed(models.Model):
     stage_of_channel = models.ForeignKey(StageOfChannel, verbose_name="Принадлежность к стадии", on_delete=models.CASCADE)
     conversion = models.DecimalField(
-        "Конверсия канала", decimal_places=2, max_digits=5, validators=[
-            MaxValueValidator(100.00),
-            MinValueValidator(0.01)
+        "Конверсия канала", decimal_places=4, max_digits=5, validators=[
+            MaxValueValidator(1.0000),
+            MinValueValidator(0.0001)
         ])
     turn = models.ForeignKey(
         Turn, verbose_name="Шаг пользователя", on_delete=models.CASCADE)

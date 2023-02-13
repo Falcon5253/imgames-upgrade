@@ -63,9 +63,9 @@ class Stage(models.Model):
                             on_delete=models.CASCADE)
     name = models.CharField("Название этапа", max_length=255)
     conversion = models.DecimalField(
-        "Стандартная конверсия на этапе", decimal_places=2, max_digits=5, validators=[
-            MaxValueValidator(100.00),
-            MinValueValidator(0.01)
+        "Стандартная конверсия на этапе", decimal_places=4, max_digits=5, validators=[
+            MaxValueValidator(1.0000),
+            MinValueValidator(0.0001)
         ])
 
     class Meta:
@@ -120,9 +120,9 @@ class StageOfChannel(models.Model):
     """Этап для конкретных каналов"""
     stage = models.ForeignKey(Stage, verbose_name="Принадлежность к стадии", on_delete=models.CASCADE)
     conversion = models.DecimalField(
-        "Конверсия канала", decimal_places=2, max_digits=5, validators=[
-            MaxValueValidator(100.00),
-            MinValueValidator(0.01)
+        "Конверсия канала", decimal_places=4, max_digits=5, validators=[
+            MaxValueValidator(1.0000),
+            MinValueValidator(0.0001)
         ])
     channels = models.ManyToManyField(Channel, blank=True, max_length=255, verbose_name='Принадлежность конверсии к каналам')
 

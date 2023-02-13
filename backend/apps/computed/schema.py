@@ -46,21 +46,22 @@ def prepare_computed_game_data_array(room, user, current_month=None):
                 try: # Если есть определенная конверсия у данного канала, то используем ее
                     certain_stage = StageOfChannel.objects.get(channels=channel, stage=stage)
                     stage_conversion = certain_stage.conversion
+                    
                 except: # Если нет, то используем стандартную конверсию канала
                     stage_conversion = stage.conversion
-
+                
                 # Высчитываем значение после конверсии
                 channel_next = ceil(channel_next * stage_conversion)
 
-                total_data[1+(2*i)] = '{0:.2f}'.format(
+                total_data[1+(2*i)] = '{0:.4f}'.format(
                     Decimal(total_data[1+(2*i)])+Decimal(0))
                 total_data[2+(2*i)] = '{0:.2f}'.format(
                     Decimal(channel_next)+Decimal(total_data[2+(2*i)]))
 
                 # Форматируем данные для ответа
-                data += ['{0:.2f}'.format(stage_conversion),
+                data += ['{0:.4f}'.format(stage_conversion),
                          '{0:.2f}'.format(channel_next)]
-
+            print(data)
             # Добавляем данные в массив возвращаемых значений
             answer_array += [ComputedGameDataType(
                 data=data, channel=channel, is_total=False)]
@@ -68,7 +69,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
         # Добавляем значение ИТОГО
         answer_array += [ComputedGameDataType(
             data=total_data, channel=None, is_total=True)]
-        # print(total_data)
+        
         return answer_array
 
     # Если не начальный месяц
@@ -109,26 +110,26 @@ def prepare_computed_game_data_array(room, user, current_month=None):
 
                 try: # Если есть определенная конверсия у данного канала, то используем ее
                     certain_stage = StageOfChannel.objects.get(channels=computed_channel.channel, stage=stage.stage)
-                    certain_computed_stages = StageOfChannelComputed.objects.get(turn=user_turn, stage_of_channel=certain_stage)
-                    stage_conversion = certain_computed_stages.conversion
-
-
+                    print(certain_stage.conversion)
+                    certain_computed_stage = StageOfChannelComputed.objects.get(turn=user_turn, stage_of_channel=certain_stage)
+                    print(certain_computed_stage.id)
+                    stage_conversion = certain_computed_stage.conversion
                 except: # Если нет, то используем стандартную конверсию канала
                     stage_conversion = stage.conversion
 
                 # Высчитываем значение после конверсии
                 channel_next = ceil(channel_next * stage_conversion)
 
-                #
-                total_data[1+(2*i)] = '{0:.2f}'.format(
+                total_data[1+(2*i)] = '{0:.4f}'.format(
                     Decimal(total_data[1+(2*i)])+Decimal(0))
                 total_data[2+(2*i)] = '{0:.2f}'.format(
                     Decimal(channel_next)+Decimal(total_data[2+(2*i)]))
 
                 # Форматируем данные для ответа
-                data += ['{0:.2f}'.format(stage_conversion),
+                print(stage_conversion)
+                data += ['{0:.4f}'.format(stage_conversion),
                          '{0:.2f}'.format(channel_next)]
-
+            print(data)
             # Добавляем данные в массив возвращаемых значений
             answer_array += [ComputedGameDataType(
                 data=data, channel=computed_channel.channel, is_total=False, month_key=current_month.key)]
@@ -136,7 +137,7 @@ def prepare_computed_game_data_array(room, user, current_month=None):
         # Добавляем значение ИТОГО
         answer_array += [ComputedGameDataType(
             data=total_data, channel=None, is_total=True, month_key=current_month.key)]
-
+        
         return answer_array
 
 

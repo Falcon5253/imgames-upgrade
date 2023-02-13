@@ -86,7 +86,6 @@ class Query(graphene.ObjectType):
                     for choice in choices:
                         card = choice.card
                         expense = card.cost
-                        print(expense)
                         expenses += expense
                 months_passed = current_month.key
                 
@@ -95,10 +94,6 @@ class Query(graphene.ObjectType):
                     return balance
                 
                 balance = room.money_per_month * (months_passed + 1)
-                print('balance')
-                print(balance)
-                print('sum')
-                print(expenses)
                 balance = balance - expenses
                 return balance
             else:
